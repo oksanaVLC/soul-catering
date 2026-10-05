@@ -1,0 +1,387 @@
+---
+import Button from '../ui/Button.astro';
+import { getLangFromUrl, isPublished, languages, localizePath, switchLangPath, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  /** full: Inicio (with newsletter). compact: Extras, Bodas, Blog, Reserva.
+      Acceso and Panel have no site footer (BaseLayout footer="none"). */
+  variant?: 'full' | 'compact';
+}
+
+const { variant = 'full' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const home = localizePath('/', lang);
+const year = 2026;
+
+// href: null → page not yet designed. Shown as text, not as a link.
+type FootLink = { label: string; href: string | null };
+const serviceLinks: FootLink[] = [
+  { label: t('footer.svcWeddings'), href: localizePath('/servicios/bodas', lang) },
+  { label: t('footer.svcCorporate'), href: null },
+  { label: t('footer.svcPrivate'), href: null },
+  { label: t('footer.svcCommunions'), href: null },
+];
+const companyLinks: FootLink[] = [
+  { label: t('footer.blog'), href: localizePath('/blog', lang) },
+  { label: t('footer.book'), href: localizePath('/reserva', lang) },
+  { label: t('footer.access'), href: localizePath('/acceso', lang) },
+  { label: t('footer.contact'), href: `${home}#contacto` },
+];
+const legalLinks: FootLink[] = [
+  { label: t('footer.legalNotice'), href: null },
+  { label: t('footer.privacy'), href: null },
+  { label: t('footer.cookies'), href: null },
+  { label: t('footer.cancellation'), href: null },
+];
+const compactLinks: FootLink[] = [
+  { label: t('footer.services'), href: `${home}#servicios` },
+  { label: t('footer.blog'), href: localizePath('/blog', lang) },
+  { label: t('footer.access'), href: localizePath('/acceso', lang) },
+  { label: t('footer.privacy'), href: null },
+];
+const columns = [
+  { title: t('footer.servicesTitle'), label: t('footer.servicesLabel'), links: serviceLinks },
+  { title: t('footer.companyTitle'), label: t('footer.companyLabel'), links: companyLinks },
+  { title: t('footer.legalTitle'), label: t('footer.legalLabel'), links: legalLinks },
+];
+---
+
+{/* Pending link: same appearance as the design, no fake navigation */}
+{
+  variant === 'full' ? (
+    <footer class="foot full">
+      <div class="container stack">
+        <form class="news" data-newsletter>
+          <div class="news-text">
+            <h2 class="serif">{t('footer.newsTitle')}</h2>
+            <p>{t('footer.newsText')}</p>
+          </div>
+          <div class="news-fields">
+            <label for="n-email" class="sr-only">
+              {t('footer.newsEmail')}
+            </label>
+            <input
+              id="n-email"
+              name="email"
+              type="email"
+              class="input"
+              placeholder={t('footer.newsEmail')}
+              autocomplete="email"
+              required
+            />
+            <Button type="submit" variant="straw" data-label-done={t('footer.newsDone')}>
+              {t('footer.newsSubmit')}
+            </Button>
+          </div>
+          <p class="sr-only" role="status" data-newsletter-status />
+        </form>
+
+        <div class="cols">
+          <div class="brand">
+            <span class="serif">{t('site.name')}</span>
+            <p>
+              {t('footer.address')}
+              <br />
+              {t('footer.city')}
+              <br />
+              {t('footer.phone')}
+              <br />
+              {t('footer.email')}
+            </p>
+          </div>
+          {columns.map((col) => (
+            <nav aria-label={col.label} class="col">
+              <span class="col-title">{col.title}</span>
+              {col.links.map((l) =>
+                l.href ? (
+                  <a href={l.href}>{l.label}</a>
+                ) : (
+                  <span class="pending">
+                    {l.label} <span class="sr-only">{t('a11y.pending')}</span>
+                  </span>
+                ),
+              )}
+            </nav>
+          ))}
+        </div>
+
+        <div class="bottom">
+          <span>{t('footer.copyright', { year })}</span>
+          <nav aria-label={t('lang.footerLabel')} class="langs">
+            {languages.map((code) =>
+
+              isPublished(code) ? (
+
+                <a
+
+                  href={switchLangPath(Astro.url.pathname, code)}
+
+                  lang={code}
+
+                  hreflang={code}
+
+                  aria-current={code === lang ? 'true' : undefined}
+
+                >
+
+                  {t(`lang.${code}`)}
+
+                </a>
+
+              ) : (
+
+                <span class="pending" lang={code}>
+
+                  {t(`lang.${code}`)}
+
+                  <span class="sr-only" lang={lang}> {t('a11y.pending')}</span>
+
+                </span>
+
+              ),
+
+            )}
+          </nav>
+        </div>
+      </div>
+    </footer>
+  ) : (
+    <footer class="foot compact">
+      <div class="container row">
+        <span class="serif logo">{t('site.name')}</span>
+        <nav aria-label={t('footer.compactLabel')} class="links">
+          {compactLinks.map((l) =>
+            l.href ? (
+              <a href={l.href}>{l.label}</a>
+            ) : (
+              <span class="pending">
+                {l.label} <span class="sr-only">{t('a11y.pending')}</span>
+              </span>
+            ),
+          )}
+        </nav>
+        <nav aria-label={t('lang.footerLabel')} class="langs">
+          {languages.map((code) =>
+
+            isPublished(code) ? (
+
+              <a
+
+                href={switchLangPath(Astro.url.pathname, code)}
+
+                lang={code}
+
+                hreflang={code}
+
+                aria-current={code === lang ? 'true' : undefined}
+
+              >
+
+                {t(`lang.${code}`)}
+
+              </a>
+
+            ) : (
+
+              <span class="pending" lang={code}>
+
+                {t(`lang.${code}`)}
+
+                <span class="sr-only" lang={lang}> {t('a11y.pending')}</span>
+
+              </span>
+
+            ),
+
+          )}
+        </nav>
+      </div>
+    </footer>
+  )
+}
+
+<style>
+  .foot {
+    background: var(--ink);
+    color: var(--foot-text);
+  }
+
+  .foot a,
+  .pending {
+    color: var(--foot-text);
+    text-decoration: none;
+  }
+
+  .foot a:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+
+  .foot a[aria-current] {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .foot :focus-visible {
+    outline-color: var(--straw);
+  }
+
+  .foot a,
+  .pending {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* ── Full ── */
+  .full {
+    padding: 90px 0 48px;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .news {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 56px;
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .news-text {
+    flex: 1 1 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .news-text h2 {
+    color: var(--white);
+    font-size: 40px;
+  }
+
+  .news-text p {
+    color: var(--foot-muted);
+  }
+
+  .news-fields {
+    flex: 1 1 440px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .news-fields .input {
+    flex: 1 1 240px;
+    width: auto;
+    border-color: var(--white);
+    border-radius: 999px;
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 48px;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .brand .serif {
+    color: var(--white);
+    font-size: 34px;
+  }
+
+  .brand p {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    font-size: 17px;
+  }
+
+  /* Design: 14px; raised to 15px (CLAUDE.md: never less than 15px for real text) */
+  .col-title {
+    font-weight: 700;
+    color: var(--foot-heading);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    border-top: 1px solid var(--line-dark);
+    padding-top: 28px;
+    font-size: 16px;
+  }
+
+  .langs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  /* ── Compact ── */
+  .compact {
+    padding: 56px 0 40px;
+    border-top: 1px solid var(--line-dark);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: center;
+    font-size: 17px;
+  }
+
+  .compact .logo {
+    color: var(--white);
+    font-size: 30px;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 24px;
+  }
+</style>
+
+<script>
+  // Simulated newsletter: native validation and success message. Sends nothing.
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-newsletter]');
+    if (!form) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const status = form.querySelector<HTMLElement>('[data-newsletter-status]');
+      if (btn?.dataset.labelDone) {
+        btn.textContent = btn.dataset.labelDone;
+        if (status) status.textContent = btn.dataset.labelDone;
+      }
+    });
+  });
+</script>

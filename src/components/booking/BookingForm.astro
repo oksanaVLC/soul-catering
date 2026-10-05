@@ -1,0 +1,857 @@
+---
+// Booking form: ONE page with six sections (CLAUDE.md §5).
+// The state lives in a single store (src/lib/reservation/store.ts); this component only
+// paints it and forwards the user's changes. Everything is DEMO: no data is sent,
+// no payment and no email.
+// Validation: on leaving each field, and an error summary at the top when trying to finish.
+import { Image } from 'astro:assets';
+import Calendar from './Calendar.astro';
+import GuestCounter from './GuestCounter.astro';
+import { menus } from '../../data/menus';
+import { bookingCatalog } from '../../data/booking-catalog';
+import { BOOKING_DEFAULTS, LOCALE, REQUIRED_VENUE_FIELDS } from '../../data/config';
+import { formatAmount, formatCents } from '../../lib/money';
+import es from '../../i18n/es.json';
+import { getLangFromUrl, languages, localizePath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const initial = BOOKING_DEFAULTS;
+// Required «Lugar» fields from the configuration (PENDING DECISION): exposed to assistive technology.
+const venueRequired = (field: string) => (REQUIRED_VENUE_FIELDS as readonly string[]).includes(field);
+
+// Error texts by field and code (keys booking.err.<field>.<code> in i18n).
+const errorMessages = Object.fromEntries(
+  Object.keys(es)
+    .filter((key) => key.startsWith('booking.err.'))
+    .map((key) => [key.replace('booking.err.', ''), t(key as keyof typeof es)]),
+);
+// Texts the browser needs to repaint the summary.
+const summaryTexts = {
+  guests: t('booking.sumGuestsValue'),
+  extras: t('booking.sumExtrasValue'),
+  extrasNone: t('booking.sumExtrasNone'),
+  dateNone: t('booking.sumDateNone'),
+  placeNone: t('booking.sumPlaceNone'),
+  interior: t('booking.indoor'),
+  exterior: t('booking.outdoor'),
+};
+---
+
+<form
+  id="reserva"
+  class="booking-form"
+  novalidate
+  data-booking
+  data-errors-text={JSON.stringify(errorMessages)}
+  data-summary-text={JSON.stringify(summaryTexts)}
+  data-languages={JSON.stringify(languages)}
+>
+  <div class="errors" role="alert" tabindex="-1" hidden data-errors>
+    <h2>{t('booking.errorsTitle')}</h2>
+    <ul data-errors-list></ul>
+  </div>
+
+  <!-- 1 MENU -->
+  <fieldset class="step" id="paso-1" data-step="1" aria-describedby="menu-error">
+    <legend class="step-h"><span class="num">1</span><span class="h2">{t('booking.s1Title')}</span></legend>
+    <div class="menus">
+      {
+        menus.map((m) => (
+          <button
+            type="button"
+            class="menu-card"
+            aria-pressed={m.id === initial.menuId ? 'true' : 'false'}
+            data-menu={m.id}
+          >
+            <Image
+              src={m.image}
+              alt=""
+              widths={[300, 450, 600]}
+              sizes="(max-width: 700px) 90vw, 260px"
+              loading="lazy"
+            />
+            <span class="menu-body">
+              <span class="menu-name">{m.name}</span>
+              <span class="menu-desc">{m.description}</span>
+              <span class="menu-price">
+                {t('booking.perPerson', { price: formatAmount(m.pricePerAdultCents, { locale: LOCALE }) })}
+              </span>
+            </span>
+          </button>
+        ))
+      }
+    </div>
+    <p class="field-error" id="menu-error"></p>
+    <p class="hint">{t('booking.s1Hint')}</p>
+  </fieldset>
+
+  <!-- 2 GUESTS -->
+  <fieldset class="step" id="paso-2" data-step="2" aria-describedby="guests-error">
+    <legend class="step-h"><span class="num">2</span><span class="h2">{t('booking.s2Title')}</span></legend>
+    <div class="counters">
+      <GuestCounter
+        id="adultos"
+        name="adults"
+        label={t('booking.adults')}
+        value={initial.guests.adults}
+        decLabel={t('booking.removeAdult')}
+        incLabel={t('booking.addAdult')}
+      />
+      <GuestCounter
+        id="ninos"
+        name="kids"
+        label={t('booking.kids')}
+        value={initial.guests.kids}
+        decLabel={t('booking.removeKid')}
+        incLabel={t('booking.addKid')}
+      />
+    </div>
+    <p class="field-error" id="guests-error"></p>
+    <p class="hint">{t('booking.s2Hint')}</p>
+  </fieldset>
+
+  <!-- 3 DATE -->
+  <fieldset class="step" id="paso-3" data-step="3" aria-describedby="fecha-error">
+    <legend class="step-h"><span class="num">3</span><span class="h2">{t('booking.s3Title')}</span></legend>
+    <div class="stack">
+      <Calendar selected={initial.date} />
+      <p class="field-error" id="fecha-error"></p>
+      <div class="grid2">
+        <div class="field">
+          <label for="hora">{t('booking.time')}</label>
+          <select id="hora" name="hora" class="input" aria-describedby="hora-error" data-input="startTime">
+            {
+              bookingCatalog.startTimes.map((time) => (
+                <option value={time} selected={time === initial.startTime}>
+                  {time}
+                </option>
+              ))
+            }
+          </select>
+          <p class="field-error" id="hora-error"></p>
+        </div>
+        <div class="field">
+          <label for="tipo">{t('booking.eventType')}</label>
+          <select id="tipo" name="tipo" class="input" aria-describedby="tipo-error" data-input="eventType">
+            {
+              bookingCatalog.eventTypes.map((type) => (
+                <option value={type} selected={type === initial.eventType}>
+                  {t(`eventType.${type}` as keyof typeof es)}
+                </option>
+              ))
+            }
+          </select>
+          <p class="field-error" id="tipo-error"></p>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- 4 PLACE -->
+  <fieldset class="step" id="paso-4" data-step="4">
+    <legend class="step-h"><span class="num">4</span><span class="h2">{t('booking.s4Title')}</span></legend>
+    <div class="stack">
+      <div class="field">
+        <label for="dir">{t('booking.address')}</label>
+        <input
+          id="dir"
+          name="direccion"
+          class="input"
+          autocomplete="street-address"
+          placeholder={t('booking.addressPlaceholder')}
+          value={initial.venue.address}
+          required={venueRequired('address')}
+            aria-describedby="dir-error"
+          data-input="address"
+        />
+        <p class="field-error" id="dir-error"></p>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="ciudad">{t('booking.city')}</label>
+          <input
+            id="ciudad"
+            name="ciudad"
+            class="input"
+            autocomplete="address-level2"
+            value={initial.venue.city}
+            required={venueRequired('city')}
+            aria-describedby="ciudad-error"
+            data-input="city"
+          />
+          <p class="field-error" id="ciudad-error"></p>
+        </div>
+        <div class="field">
+          <label for="cp">{t('booking.postcode')}</label>
+          <input
+            id="cp"
+            name="cp"
+            class="input"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            value={initial.venue.postalCode}
+            required={venueRequired('postalCode')}
+            aria-describedby="cp-error"
+            data-input="postalCode"
+          />
+          <p class="field-error" id="cp-error"></p>
+        </div>
+      </div>
+      <fieldset class="field sub">
+        <legend class="legend">{t('booking.space')}</legend>
+        <div class="grid2">
+          <label class="opt"
+            ><input
+              type="radio"
+              name="espacio"
+              value="interior"
+              checked={initial.venue.space === 'interior'}
+              data-input="space"
+            />{t('booking.indoor')}</label
+          >
+          <label class="opt"
+            ><input
+              type="radio"
+              name="espacio"
+              value="exterior"
+              checked={initial.venue.space === 'exterior'}
+              data-input="space"
+            />{t('booking.outdoor')}</label
+          >
+        </div>
+      </fieldset>
+    </div>
+  </fieldset>
+
+  <!-- 5 EXTRAS -->
+  <fieldset class="step" id="paso-5" data-step="5" aria-describedby="extras-error">
+    <legend class="step-h"><span class="num">5</span><span class="h2">{t('booking.s5Title')}</span></legend>
+    <div class="extras">
+      <p class="hint s5-hint">
+        {t('booking.s5Hint')} <a href={localizePath('/extras', lang)}>{t('booking.s5Link')}</a>
+      </p>
+      {
+        bookingCatalog.extras.map((x) => (
+          <label class="check">
+            <input
+              type="checkbox"
+              name="extras"
+              value={x.id}
+              checked={initial.extraIds.includes(x.id)}
+              data-input="extra"
+            />
+            <span class="grow">{x.name}</span>
+            <span class="price">+{formatCents(x.priceCents, { locale: LOCALE })}</span>
+          </label>
+        ))
+      }
+      <p class="field-error" id="extras-error"></p>
+    </div>
+  </fieldset>
+
+  <!-- 6 YOUR DETAILS AND PAYMENT -->
+  <fieldset class="step" id="paso-6" data-step="6">
+    <legend class="step-h"><span class="num">6</span><span class="h2">{t('booking.s6Title')}</span></legend>
+    <div class="stack">
+      <div class="grid2">
+        <div class="field">
+          <label for="nombre">{t('booking.name')}</label>
+          <input
+            id="nombre"
+            name="nombre"
+            class="input"
+            autocomplete="name"
+            required
+            value={initial.contact.name}
+            aria-describedby="nombre-error"
+            data-input="name"
+          />
+          <p class="field-error" id="nombre-error"></p>
+        </div>
+        <div class="field">
+          <label for="tel">{t('booking.phone')}</label>
+          <input
+            id="tel"
+            name="telefono"
+            type="tel"
+            class="input"
+            autocomplete="tel"
+            required
+            value={initial.contact.phone}
+            aria-describedby="tel-error"
+            data-input="phone"
+          />
+          <p class="field-error" id="tel-error"></p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="email">{t('booking.email')}</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            class="input"
+            autocomplete="email"
+            required
+            value={initial.contact.email}
+            aria-describedby="email-hint email-error"
+            data-input="email"
+          />
+          <p class="hint" id="email-hint">{t('booking.emailHint')}</p>
+          <p class="field-error" id="email-error"></p>
+        </div>
+        <div class="field">
+          <label for="idioma">{t('booking.contactLang')}</label>
+          <select id="idioma" name="idioma" class="input" aria-describedby="idioma-error" data-input="language">
+            {
+              languages.map((code) => (
+                <option value={code} selected={code === initial.contact.language}>
+                  {t(`lang.${code}`)}
+                </option>
+              ))
+            }
+          </select>
+          <p class="field-error" id="idioma-error"></p>
+        </div>
+      </div>
+      <fieldset class="field sub">
+        <legend class="legend">{t('booking.allergies')}</legend>
+        <div class="allergens">
+          {
+            bookingCatalog.allergens.map((allergen) => (
+              <label class="check">
+                <input
+                  type="checkbox"
+                  name="alergenos"
+                  value={allergen.id}
+                  checked={initial.allergenIds.includes(allergen.id)}
+                  data-input="allergen"
+                />
+                {allergen.label}
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <div class="field">
+        <label for="notas">{t('booking.comments')}</label>
+        <textarea
+          id="notas"
+          name="notas"
+          class="input notes"
+          placeholder={t('booking.commentsPlaceholder')}
+          data-input="comments">{initial.comments}</textarea>
+      </div>
+      <div class="field">
+        <label class="check accept">
+          <input
+            type="checkbox"
+            id="privacidad"
+            name="privacidad"
+            required
+            checked={initial.acceptsPolicies}
+            aria-describedby="privacidad-error"
+            data-input="policies"
+          />
+          <span>
+            {t('booking.acceptBefore')}{' '}
+            <a class="is-pending"
+              >{t('common.privacyPolicy')}<span class="sr-only"> {t('a11y.pending')}</span></a
+            >
+            {' '}{t('booking.acceptAnd')}{' '}
+            <a class="is-pending"
+              >{t('common.cancellationPolicy')}<span class="sr-only"> {t('a11y.pending')}</span></a
+            >.
+          </span>
+        </label>
+        <p class="field-error" id="privacidad-error"></p>
+      </div>
+    </div>
+  </fieldset>
+</form>
+
+<style>
+  .booking-form {
+    flex: 999 1 620px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .errors {
+    background: var(--white);
+    border: 2px solid var(--error);
+    border-radius: 12px;
+    padding: 28px 32px;
+  }
+
+  .errors h2 {
+    font-family: var(--font-sans);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--error);
+    margin-bottom: 10px;
+  }
+
+  .errors ul {
+    margin: 0;
+    padding-left: 22px;
+  }
+
+  .errors :global(a) {
+    color: var(--error);
+    font-weight: 600;
+  }
+
+  .step {
+    margin: 0;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    min-width: 0;
+    scroll-margin-top: 24px;
+  }
+
+  .step-h {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0;
+    float: left;
+    width: 100%;
+  }
+
+  .step-h + * {
+    clear: both;
+  }
+
+  .num {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+    flex: none;
+  }
+
+  .h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: 24px;
+  }
+
+  .sub {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sub > .legend {
+    padding: 0;
+    margin-bottom: 10px;
+  }
+
+  .menus {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 20px;
+  }
+
+  .menu-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    text-align: left;
+    background: var(--white);
+    font: inherit;
+    padding: 0;
+    color: inherit;
+    border: 1.5px solid var(--line-strong);
+  }
+
+  .menu-card[aria-pressed='true'] {
+    border: 3px solid var(--ink);
+    box-shadow: 0 8px 24px rgba(20, 20, 20, 0.1);
+  }
+
+  .menu-card :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .menu-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px;
+  }
+
+  .menu-name {
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .menu-desc {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .menu-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  .counters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+  }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 60px;
+    padding: 0 20px;
+    border: 1.5px solid var(--field-border-a11y);
+    border-radius: 8px;
+    font-size: 19px;
+    cursor: pointer;
+    background: var(--white);
+  }
+
+  .opt input {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--ink);
+    margin: 0;
+  }
+
+  .extras {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .s5-hint {
+    font-size: 18px;
+    color: var(--text-2);
+  }
+
+  .grow {
+    flex: 1;
+  }
+
+  .price {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .allergens {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+    gap: 0 20px;
+  }
+
+  .notes {
+    min-height: 130px;
+  }
+
+  .accept {
+    align-items: flex-start;
+  }
+
+  .accept input {
+    margin-top: 3px;
+  }
+
+  .accept a {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .step {
+      padding: 26px 20px;
+    }
+
+    .h2 {
+      font-size: 24px;
+    }
+  }
+</style>
+
+<script>
+  // Connects the DOM with the booking store. The state lives ONLY in the store:
+  // the events forward changes and render() repaints everything derived from it.
+  import { createReservationStore, type ReservationState } from '../../lib/reservation/store';
+  import { getDayStatus, isSelectable } from '../../lib/reservation/availability';
+  import { formatCents } from '../../lib/money';
+  import { formatLongDate, todayIso } from '../../lib/dates';
+  import { bookingCatalog } from '../../data/booking-catalog';
+  import { availability } from '../../data/availability';
+  import { BOOKING_DEFAULTS, LOCALE, reservationConfig } from '../../data/config';
+  import type {
+    GuestGroup,
+    Lang,
+    ReservationField,
+    ReservationSummary,
+    ReservationValidationError,
+    SpaceType,
+  } from '../../types/reservation';
+
+  /** Where each field's error is shown and where to go from the summary. */
+  const FIELD_DOM: Record<ReservationField, { error: string; target: string }> = {
+    menu: { error: 'menu-error', target: 'paso-1' },
+    guests: { error: 'guests-error', target: 'paso-2' },
+    date: { error: 'fecha-error', target: 'paso-3' },
+    startTime: { error: 'hora-error', target: 'hora' },
+    eventType: { error: 'tipo-error', target: 'tipo' },
+    address: { error: 'dir-error', target: 'dir' },
+    city: { error: 'ciudad-error', target: 'ciudad' },
+    postalCode: { error: 'cp-error', target: 'cp' },
+    extras: { error: 'extras-error', target: 'paso-5' },
+    name: { error: 'nombre-error', target: 'nombre' },
+    phone: { error: 'tel-error', target: 'tel' },
+    email: { error: 'email-error', target: 'email' },
+    language: { error: 'idioma-error', target: 'idioma' },
+    policies: { error: 'privacidad-error', target: 'privacidad' },
+  };
+  /** Fields validated on leaving them (blur / change). */
+  const BLUR_FIELDS = new Set<ReservationField>(['address', 'city', 'postalCode', 'name', 'phone', 'email', 'policies']);
+
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-booking]');
+    if (!form) return;
+    const errorTexts: Record<string, string> = JSON.parse(form.dataset.errorsText ?? '{}');
+    const texts: Record<string, string> = JSON.parse(form.dataset.summaryText ?? '{}');
+    const languages: string[] = JSON.parse(form.dataset.languages ?? '[]');
+    const fill = (tpl: string, vars: Record<string, string | number>) =>
+      tpl.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''));
+    const money = (cents: number) => formatCents(cents, { locale: LOCALE });
+    const today = todayIso();
+
+    const store = createReservationStore({
+      initial: BOOKING_DEFAULTS,
+      catalog: bookingCatalog,
+      config: reservationConfig,
+      availability,
+      today,
+      languages,
+    });
+
+    // ── Calendar: final status of each day with the shared logic (getDayStatus) ──
+    const cal = form.querySelector<HTMLElement>('[data-calendar]');
+    const days = [...form.querySelectorAll<HTMLButtonElement>('[data-date]')];
+    const statusLabels: Record<string, string> = JSON.parse(cal?.dataset.statusLabels ?? '{}');
+    days.forEach((day) => {
+      const status = getDayStatus(day.dataset.date ?? '', { availability, config: reservationConfig, today });
+      day.disabled = !isSelectable(status);
+      day.classList.toggle('out', ['past', 'out-of-range', 'no-data'].includes(status));
+      day.dataset.baseLabel = `${day.dataset.day} de ${day.dataset.monthName}, ${statusLabels[status] ?? ''}`;
+    });
+    if (cal) {
+      const monthsEls = [...cal.querySelectorAll<HTMLElement>('[data-cal-month]')];
+      const label = cal.querySelector<HTMLElement>('[data-cal-label]');
+      const prev = cal.querySelector<HTMLButtonElement>('[data-cal-prev]');
+      const next = cal.querySelector<HTMLButtonElement>('[data-cal-next]');
+      let current = Math.max(0, monthsEls.findIndex((m) => !m.hidden));
+      const showMonth = (i: number) => {
+        current = Math.max(0, Math.min(monthsEls.length - 1, i));
+        monthsEls.forEach((m, n) => (m.hidden = n !== current));
+        if (label) label.textContent = monthsEls[current]?.dataset.label ?? '';
+        if (prev) prev.disabled = current === 0;
+        if (next) next.disabled = current === monthsEls.length - 1;
+      };
+      prev?.addEventListener('click', () => showMonth(current - 1));
+      next?.addEventListener('click', () => showMonth(current + 1));
+      showMonth(current);
+    }
+
+    // ── Events → store ──
+    form.querySelectorAll<HTMLButtonElement>('[data-menu]').forEach((card) =>
+      card.addEventListener('click', () => store.selectMenu(card.dataset.menu ?? '')),
+    );
+    form.querySelectorAll<HTMLElement>('[data-counter]').forEach((counter) => {
+      const group = counter.dataset.counter as GuestGroup;
+      counter.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) =>
+        btn.addEventListener('click', () => store.changeGuests(group, Number(btn.dataset.step))),
+      );
+    });
+    days.forEach((day) => day.addEventListener('click', () => store.selectDate(day.dataset.date ?? null)));
+
+    const touched = new Set<ReservationField>();
+    form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-input]').forEach((el) => {
+      const kind = el.dataset.input;
+      const isCheck = el instanceof HTMLInputElement && (el.type === 'checkbox' || el.type === 'radio');
+      el.addEventListener(isCheck || el instanceof HTMLSelectElement ? 'change' : 'input', () => {
+        const value = el.value;
+        const checked = el instanceof HTMLInputElement && el.checked;
+        switch (kind) {
+          case 'startTime': return store.setStartTime(value);
+          case 'eventType': return store.setEventType(value);
+          case 'address': return store.updateVenue({ address: value });
+          case 'city': return store.updateVenue({ city: value });
+          case 'postalCode': return store.updateVenue({ postalCode: value });
+          case 'space': return checked && store.updateVenue({ space: value as SpaceType });
+          case 'extra': return store.setExtra(value, checked);
+          case 'name': return store.updateContact({ name: value });
+          case 'phone': return store.updateContact({ phone: value });
+          case 'email': return store.updateContact({ email: value });
+          case 'language': return store.updateContact({ language: value as Lang });
+          case 'allergen': return store.setAllergen(value, checked);
+          case 'comments': return store.setComments(value);
+          case 'policies':
+            store.setAcceptsPolicies(checked);
+            touched.add('policies');
+            return render(store.getState(), store.getSummary());
+        }
+      });
+      // Validation on leaving the field
+      if (BLUR_FIELDS.has(kind as ReservationField) && kind !== 'policies') {
+        el.addEventListener('blur', () => {
+          touched.add(kind as ReservationField);
+          render(store.getState(), store.getSummary());
+        });
+      }
+    });
+
+    // ── Rendering (everything derived from the state) ──
+    const errorsBox = form.querySelector<HTMLElement>('[data-errors]');
+    const errorsList = form.querySelector<HTMLElement>('[data-errors-list]');
+    const sum = (key: string) => document.querySelector<HTMLElement>(`[data-sum="${key}"]`);
+    const setText = (key: string, text: string) => {
+      const el = sum(key);
+      if (el && el.textContent !== text) el.textContent = text;
+    };
+    const message = (e: ReservationValidationError) => errorTexts[`${e.field}.${e.code}`] ?? errorTexts[`${e.field}.required`] ?? '';
+
+    function render(state: ReservationState, summary: ReservationSummary) {
+      const { input } = state;
+      form!.querySelectorAll<HTMLButtonElement>('[data-menu]').forEach((card) =>
+        card.setAttribute('aria-pressed', String(card.dataset.menu === input.menuId)),
+      );
+      form!.querySelectorAll<HTMLElement>('[data-counter]').forEach((counter) => {
+        const output = counter.querySelector('output');
+        if (output) output.textContent = String(input.guests[counter.dataset.counter as GuestGroup]);
+      });
+      days.forEach((day) => {
+        const on = day.dataset.date === input.date;
+        day.setAttribute('aria-pressed', String(on));
+        day.setAttribute('aria-label', on ? `${day.dataset.baseLabel}, ${cal?.dataset.labelSelected}` : (day.dataset.baseLabel ?? ''));
+      });
+
+      // Summary
+      setText('menu', summary.menu?.name ?? '—');
+      setText('guests', fill(texts.guests, summary.guests as unknown as Record<string, number>));
+      setText('date', summary.date ? formatLongDate(summary.date, LOCALE) : texts.dateNone);
+      const city = summary.venue.city.trim();
+      setText('place', city ? `${city} · ${texts[summary.venue.space]}` : texts.placeNone);
+      setText('extras', summary.extras.length ? fill(texts.extras, { n: summary.extras.length }) : texts.extrasNone);
+      setText('subtotal', money(summary.subtotalCents));
+      const subtotalRow = document.querySelector<HTMLElement>('[data-sum-row="subtotal"]');
+      if (subtotalRow) subtotalRow.hidden = summary.subtotalCents === summary.totalCents;
+      setText('total', money(summary.totalCents));
+      setText('deposit', money(summary.depositCents));
+      setText('rest', money(summary.restCents));
+
+      // Field errors: those of the last attempt, or those of fields already visited
+      const visible = state.status === 'invalid'
+        ? state.errors
+        : [...touched].flatMap((field) => store.validateField(field));
+      const byField = new Map(visible.map((e) => [e.field, e]));
+      (Object.keys(FIELD_DOM) as ReservationField[]).forEach((field) => {
+        const { error, target } = FIELD_DOM[field];
+        const el = document.getElementById(error);
+        const err = byField.get(field);
+        if (el) el.textContent = err ? message(err) : '';
+        const control = document.getElementById(target);
+        if (control && !control.matches('fieldset')) {
+          if (err) control.setAttribute('aria-invalid', 'true');
+          else control.removeAttribute('aria-invalid');
+        }
+      });
+
+      // Top error summary (only after trying to finish)
+      if (errorsBox && errorsList) {
+        const show = state.status === 'invalid' && state.errors.length > 0;
+        errorsBox.hidden = !show;
+        if (show) {
+          errorsList.replaceChildren(
+            ...state.errors.map((e) => {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.href = `#${FIELD_DOM[e.field].target}`;
+              a.textContent = message(e);
+              a.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                const target = document.getElementById(FIELD_DOM[e.field].target);
+                target?.scrollIntoView({ block: 'center' });
+                const focusable = target?.matches('fieldset')
+                  ? target.querySelector<HTMLElement>('[aria-pressed="true"], button:not(:disabled)')
+                  : target;
+                focusable?.focus();
+              });
+              li.append(a);
+              return li;
+            }),
+          );
+        }
+      }
+
+      const submitBtn = document.querySelector<HTMLButtonElement>('button[type="submit"][form="reserva"]');
+      if (submitBtn) submitBtn.toggleAttribute('aria-busy', state.status === 'submitting');
+    }
+
+    store.subscribe(render);
+
+    // ── Try to finish: centralized validation + DEMO submission (no network) ──
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const result = await store.submit();
+      if (!result.ok) {
+        errorsBox?.scrollIntoView({ block: 'start' });
+        errorsBox?.focus();
+        return;
+      }
+      form.dispatchEvent(
+        new CustomEvent('booking:done', { bubbles: true, detail: { date: store.getState().input.date } }),
+      );
+    });
+    // The page asks to go back to the form from the «Solicitud recibida» screen.
+    form.addEventListener('booking:back', () => store.backToEditing());
+  });
+</script>

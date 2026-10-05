@@ -1,0 +1,61 @@
+---
+import Slider from '../ui/Slider.astro';
+import ExtraCard from '../ui/ExtraCard.astro';
+import Button from '../ui/Button.astro';
+import { extras } from '../../data/extras';
+import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section id="extras" class="paperbg section" aria-labelledby="extras-title">
+  <div class="container">
+    <div class="head">
+      <p class="eyebrow">{t('home.extras.eyebrow')}</p>
+      <h2 id="extras-title">{t('home.extras.title')}</h2>
+      <p class="lead">{t('home.extras.text')}</p>
+    </div>
+  </div>
+  <Slider prevLabel={t('home.extras.prev')} nextLabel={t('home.extras.next')} arrowTop="34%">
+    {extras.map((extra, i) => <ExtraCard extra={extra} index={i} />)}
+  </Slider>
+  <div class="container more">
+    <Button href={localizePath('/extras', lang)}>{t('home.extras.cta')}</Button>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 130px 0 110px;
+    background: var(--bg);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 52px;
+    max-width: 760px;
+  }
+
+  .head .lead {
+    font-size: 19px;
+  }
+
+  .more {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 700px) {
+    .section {
+      padding: 88px 0 72px;
+    }
+
+    .head {
+      margin-bottom: 36px;
+    }
+  }
+</style>

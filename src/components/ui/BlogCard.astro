@@ -1,0 +1,82 @@
+---
+// Blog card. No link: the articles (/blog/[slug]) are pending.
+import { Image } from 'astro:assets';
+import type { Post } from '../../data/blog';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  post: Post;
+  /** teaser: Inicio block (no summary). list: /blog grid (with summary). */
+  variant?: 'teaser' | 'list';
+}
+
+const { post, variant = 'list' } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const minutes =
+  variant === 'teaser'
+    ? t('common.readMinutes', { min: post.minutes })
+    : t('common.minutes', { min: post.minutes });
+---
+
+<article class:list={['post', variant]} data-cat={post.category} data-slug={post.slug}>
+  <div class="img">
+    <Image
+      src={post.image}
+      alt={post.alt}
+      widths={[400, 600, 800]}
+      sizes="(max-width: 760px) 100vw, 380px"
+      loading="lazy"
+    />
+  </div>
+  <p class="meta">
+    <span>{post.category}</span><span aria-hidden="true">·</span><span>{minutes}</span>
+  </p>
+  <h3 class="serif">{post.title}</h3>
+  {post.excerpt && variant === 'list' && <p class="excerpt">{post.excerpt}</p>}
+</article>
+
+<style>
+  .post {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .img {
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .img :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+
+  .meta {
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 600;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .teaser .meta {
+    gap: 0.3em;
+  }
+
+  .teaser h3 {
+    font-size: 30px;
+  }
+
+  .list h3 {
+    font-size: 32px;
+  }
+
+  .excerpt {
+    color: var(--muted);
+  }
+</style>

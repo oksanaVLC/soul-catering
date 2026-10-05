@@ -1,0 +1,276 @@
+---
+// /blog: listing only, with the design's demo data. /blog/[slug] is pending:
+// the cards have no link and the pagination has no destination pages.
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/ui/PageHero.astro';
+import BlogCard from '../../components/ui/BlogCard.astro';
+import canapesRemolacha from '../../assets/images/canapes-remolacha.webp';
+import { blogCategories, featuredPost, posts } from '../../data/blog';
+import { LOCALE } from '../../data/config';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+// Format from the design: «18 sept. 2026» (abbreviated month with a period).
+// The engine gives «18 sept 2026», so the period is added only when the month is abbreviated.
+const formatPostDate = (iso: string) => {
+  const date = new Date(`${iso}T12:00:00`);
+  const long = date.toLocaleDateString(LOCALE, { month: 'long' });
+  return new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', year: 'numeric' })
+    .formatToParts(date)
+    .map((p) => (p.type === 'month' && p.value !== long && !p.value.endsWith('.') ? `${p.value}.` : p.value))
+    .join('');
+};
+const featuredDate = featuredPost.date ? formatPostDate(featuredPost.date) : '';
+---
+
+<BaseLayout title={t('blog.title')} footer="compact">
+  <div data-blog>
+    <PageHero image={canapesRemolacha} position="center 45%" padTop={380} padBottom={72}>
+      <p class="eyebrow">{t('blog.eyebrow')}</p>
+      <h1 class="h1">{t('blog.h1')}</h1>
+      <div role="group" aria-label={t('blog.filterLabel')} class="filters">
+        {
+          blogCategories.map((cat, i) => (
+            <button
+              type="button"
+              class="chip blog-chip"
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              data-filter={cat}
+            >
+              {cat}
+            </button>
+          ))
+        }
+      </div>
+    </PageHero>
+
+    <section class="featured-wrap" aria-label={t('blog.featured')}>
+      <div class="container">
+        <article class="featured" data-cat={featuredPost.category} data-slug={featuredPost.slug}>
+          <div class="img">
+            <Image
+              src={featuredPost.image}
+              alt={featuredPost.alt}
+              widths={[500, 800, 1100]}
+              sizes="(max-width: 1000px) 100vw, 560px"
+              loading="eager"
+            />
+          </div>
+          <div class="body">
+            <p class="meta">
+              <span class="gold">{t('blog.featured')}</span><span aria-hidden="true">·</span><span
+                >{featuredPost.category}</span
+              >
+            </p>
+            <h2>{featuredPost.title}</h2>
+            <p class="lead">{featuredPost.excerpt}</p>
+            <p class="meta">
+              <time datetime={featuredPost.date}>{featuredDate}</time><span aria-hidden="true"
+                >·</span
+              ><span>{t('common.readMinutes', { min: featuredPost.minutes })}</span>
+            </p>
+            <span class="more">
+              {t('blog.readMore')}<span class="sr-only"> {t('a11y.pending')}</span>
+            </span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="list" aria-label={t('blog.title')}>
+      <div class="container stack">
+        <div class="grid">
+          {posts.map((post) => <BlogCard post={post} variant="list" />)}
+        </div>
+        <p class="empty" hidden data-empty>{t('blog.empty')}</p>
+        <nav aria-label={t('blog.pagination')} class="pages">
+          <span class="page current" aria-current="page">1</span>
+          <a class="page is-pending">2<span class="sr-only"> {t('a11y.pending')}</span></a>
+          <a class="page is-pending">3<span class="sr-only"> {t('a11y.pending')}</span></a>
+          <a class="page next is-pending">
+            {t('blog.nextPage')}<span class="sr-only"> {t('a11y.pending')}</span>
+          </a>
+        </nav>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .h1 {
+    font-size: clamp(52px, 6vw, 84px);
+    max-width: 900px;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .blog-chip {
+    min-height: 48px;
+    border-color: var(--line-chip);
+  }
+
+  .blog-chip[aria-pressed='true'] {
+    border-color: var(--ink);
+  }
+
+  .featured-wrap {
+    padding: 24px 0 96px;
+  }
+
+  .featured {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr));
+    gap: 56px;
+    align-items: center;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px;
+  }
+
+  .featured .img {
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .featured :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 12px 20px 12px 0;
+  }
+
+  .body h2 {
+    font-size: clamp(36px, 3.6vw, 52px);
+  }
+
+  .body .lead {
+    font-size: 19px;
+  }
+
+  .meta {
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 600;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .gold {
+    color: var(--gold);
+  }
+
+  .more {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .list {
+    padding: 0 0 120px;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: 64px 40px;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .pages {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .page {
+    min-width: 52px;
+    min-height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .page.current {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .page.next {
+    border-radius: 999px;
+    padding: 0 20px;
+  }
+
+  @media (max-width: 700px) {
+    .featured {
+      padding: 16px;
+      gap: 24px;
+    }
+
+    .body {
+      padding: 0 4px 8px;
+    }
+
+    .featured-wrap {
+      padding-bottom: 64px;
+    }
+
+    .list {
+      padding-bottom: 88px;
+    }
+  }
+</style>
+
+<script>
+  // Category filter on the demo data (the featured article also takes part).
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-blog]');
+    if (!root) return;
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const items = [...root.querySelectorAll<HTMLElement>('article[data-cat]')];
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    chips.forEach((chip) =>
+      chip.addEventListener('click', () => {
+        const cat = chip.dataset.filter;
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        let shown = 0;
+        items.forEach((item) => {
+          const visible = cat === 'Todos' || item.dataset.cat === cat;
+          item.hidden = !visible;
+          if (visible) shown++;
+        });
+        if (empty) empty.hidden = shown > 0;
+      }),
+    );
+  });
+</script>

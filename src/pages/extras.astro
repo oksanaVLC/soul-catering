@@ -1,0 +1,205 @@
+---
+// /extras: DEMO catalog. Filters and «Añadir a mi reserva» only change the interface state.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/ui/PageHero.astro';
+import ExtraCard from '../components/ui/ExtraCard.astro';
+import Button from '../components/ui/Button.astro';
+import servilletaLazo from '../assets/images/servilleta-lazo.webp';
+import { extras, extraCategories, extrasInitiallySelected } from '../data/extras';
+import { getLangFromUrl, localizePath, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const initialCount = extrasInitiallySelected.length;
+---
+
+<BaseLayout title={t('extras.title')} footer="compact">
+  <div data-extras>
+    <PageHero image={servilletaLazo} position="center 40%" padTop={360} padBottom={56} fade={0.75}>
+      <nav aria-label={t('common.breadcrumb')} class="breadcrumbs">
+        <a href={localizePath('/', lang)}>{t('common.home')}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{t('extras.title')}</span>
+      </nav>
+      <h1 class="h1">{t('extras.h1')}</h1>
+      <p class="lead intro">{t('extras.lead')}</p>
+      <div role="group" aria-label={t('extras.filterLabel')} class="filters">
+        {
+          extraCategories.map((cat, i) => (
+            <button
+              type="button"
+              class="chip"
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              data-filter={cat}
+            >
+              {cat}
+            </button>
+          ))
+        }
+      </div>
+    </PageHero>
+
+    <section class="catalog" aria-label={t('extras.title')}>
+      <div class="container">
+        <div class="grid">
+          {
+            extras.map((extra, i) => {
+              const on = extrasInitiallySelected.includes(extra.id);
+              return (
+                <ExtraCard extra={extra} index={i} variant="grid">
+                  <p class="price">{t('extras.priceFrom')}</p>
+                  <button
+                    type="button"
+                    class="btn add"
+                    aria-pressed={on ? 'true' : 'false'}
+                    data-extra={extra.id}
+                    data-label-add={t('extras.add')}
+                    data-label-added={t('extras.added')}
+                  >
+                    {on ? t('extras.added') : t('extras.add')}
+                  </button>
+                </ExtraCard>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
+
+    <div class="selection">
+      <div class="container bar">
+        <p aria-live="polite">
+          <strong data-count>{initialCount}</strong>{' '}
+          <span
+            data-count-label
+            data-one={t('extras.countOne')}
+            data-many={t('extras.countMany')}
+          >
+            {initialCount === 1 ? t('extras.countOne') : t('extras.countMany')}
+          </span>
+        </p>
+        <Button href={localizePath('/reserva', lang)} variant="straw">{t('extras.continue')}</Button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .h1 {
+    font-size: clamp(50px, 6vw, 84px);
+    max-width: 900px;
+  }
+
+  .intro {
+    max-width: 720px;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .catalog {
+    padding: 64px 0 120px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+    gap: 52px 32px;
+  }
+
+  .price {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .add {
+    width: 100%;
+    background: var(--white);
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .add:hover {
+    background: var(--light-hover);
+  }
+
+  .add[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .add[aria-pressed='true']:hover {
+    background: var(--ink-hover);
+  }
+
+  .selection {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  @media (max-width: 700px) {
+    .catalog {
+      padding: 40px 0 88px;
+    }
+
+    .bar {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-extras]');
+    if (!root) return;
+
+    // Category filters
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('.excard')];
+    chips.forEach((chip) =>
+      chip.addEventListener('click', () => {
+        const cat = chip.dataset.filter;
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        cards.forEach((card) => {
+          card.hidden = !(cat === 'Todos' || card.dataset.cat === cat);
+        });
+      }),
+    );
+
+    // Selection (interface only)
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const label = root.querySelector<HTMLElement>('[data-count-label]');
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-extra]')];
+    const update = () => {
+      const n = buttons.filter((b) => b.getAttribute('aria-pressed') === 'true').length;
+      if (count) count.textContent = String(n);
+      if (label) label.textContent = (n === 1 ? label.dataset.one : label.dataset.many) ?? '';
+    };
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const on = btn.getAttribute('aria-pressed') !== 'true';
+        btn.setAttribute('aria-pressed', String(on));
+        btn.textContent = (on ? btn.dataset.labelAdded : btn.dataset.labelAdd) ?? '';
+      }),
+    );
+    buttons.forEach((btn) => btn.addEventListener('click', update));
+  });
+</script>

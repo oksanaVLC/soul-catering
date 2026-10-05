@@ -1,0 +1,167 @@
+---
+// Extra card (Inicio slider and /extras grid). Without a photo, it shows the design's
+// «Foto pendiente» placeholder with an icon.
+import { Image } from 'astro:assets';
+import type { Extra } from '../../data/extras';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  extra: Extra;
+  /** Position in the full catalog: determines the placeholder color (as in the design). */
+  index: number;
+  /** slide: <li> of the Inicio slider. grid: <article> of /extras (with price and button in the slot). */
+  variant?: 'slide' | 'grid';
+}
+
+const { extra, index, variant = 'slide' } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const Tag = variant === 'slide' ? 'li' : 'article';
+const Heading = variant === 'slide' ? 'h3' : 'h2';
+const placeholder = ['ph-dark', 'ph-straw', 'ph-grey'][index % 3];
+---
+
+<Tag class:list={['excard', variant]} data-cat={extra.cat}>
+  {
+    extra.image ? (
+      <div class="ph">
+        <Image
+          src={extra.image}
+          alt={extra.alt ?? ''}
+          widths={[300, 450, 600]}
+          sizes="(max-width: 700px) 84vw, (max-width: 1100px) 50vw, 300px"
+          loading="lazy"
+        />
+      </div>
+    ) : (
+      <div class:list={['ph-box', placeholder]} role="img" aria-label={extra.title}>
+        <svg
+          width="64"
+          height="64"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d={extra.icon} />
+        </svg>
+        <span class="ph-tag" aria-hidden="true">
+          {t('common.photoPending')}
+        </span>
+      </div>
+    )
+  }
+  <span class="cat">{extra.cat}</span>
+  <Heading class="serif title">{extra.title}</Heading>
+  <p class="text">{extra.text}</p>
+  <slot />
+</Tag>
+
+<style>
+  .excard {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+  }
+
+  .slide {
+    flex: 0 0 calc((100% - 84px) / 4);
+    scroll-snap-align: start;
+  }
+
+  .grid {
+    gap: 14px;
+  }
+
+  .ph {
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .ph :global(img),
+  .ph-box {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  .slide .ph :global(img) {
+    transition: transform 0.7s ease;
+  }
+
+  .slide:hover .ph :global(img) {
+    transform: scale(1.04);
+  }
+
+  .ph-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    position: relative;
+  }
+
+  .ph-dark {
+    background: var(--ink);
+    color: var(--foot-heading);
+  }
+
+  .ph-straw {
+    background: var(--mock-bg);
+    color: var(--ink);
+  }
+
+  .ph-grey {
+    background: var(--placeholder-grey);
+    color: var(--ink);
+  }
+
+  /* Design: 14px; 15px (CLAUDE.md minimum for real text) */
+  .ph-tag {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .cat {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .text {
+    color: var(--text-2);
+    font-size: 18px;
+  }
+
+  .grid .text {
+    flex: 1;
+  }
+
+  @media (max-width: 1100px) {
+    .slide {
+      flex-basis: calc((100% - 28px) / 2);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .slide {
+      flex-basis: 84%;
+    }
+  }
+</style>

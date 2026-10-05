@@ -1,0 +1,98 @@
+---
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/plus-jakarta-sans/400.css';
+import '@fontsource/plus-jakarta-sans/500.css';
+import '@fontsource/plus-jakarta-sans/600.css';
+import '@fontsource/plus-jakarta-sans/700.css';
+import '../styles/global.css';
+
+import { getImage } from 'astro:assets';
+import { ClientRouter, fade } from 'astro:transitions';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import paperTexture from '../assets/images/texture-paper.jpg';
+import silverTexture from '../assets/images/texture-silver.jpg';
+import { getLangFromUrl, publishedLanguages, switchLangPath, useTranslations } from '../i18n/utils';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Site footer: full (Inicio), compact (Extras, Bodas, Blog, Reserva), none (Acceso, Panel). */
+  footer?: 'full' | 'compact' | 'none';
+  /** site: general header. overlay: same header on top of the hero (Inicio).
+      none: no general header (prepared for /acceso, which has its own header in the design). */
+  header?: 'site' | 'overlay' | 'none';
+  /** false: the page provides its own <main id="main-content"> (Acceso, Panel: own structure). */
+  wrapMain?: boolean;
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+// PROVISIONAL: 'site.description' is a temporary meta description (based on the hero
+// subtitle), pending final text.
+const {
+  title,
+  description = t('site.description'),
+  footer = 'full',
+  header = 'site',
+  wrapMain = true,
+} = Astro.props;
+
+const siteName = t('site.name');
+const pageTitle = title ? `${title} · ${siteName}` : siteName;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// hreflang only for versions that exist (unpublished languages would point to a 404).
+const alternates = publishedLanguages.map((code) => ({
+  code,
+  href: new URL(switchLangPath(Astro.url.pathname, code), Astro.site).href,
+}));
+
+// Textures: optimized versions, applied as background in ::before (global.css)
+const paper = await getImage({ src: paperTexture, width: 1600, format: 'webp', quality: 70 });
+const silver = await getImage({ src: silverTexture, width: 1600, format: 'webp', quality: 70 });
+// og:locale in language_TERRITORY format. PENDING DECISION: territory for English.
+const ogLocale = { es: 'es_ES', en: 'en', fr: 'fr_FR', ru: 'ru_RU' }[lang];
+const textureVars = `--tex-paper: url("${paper.src}"); --tex-silver: url("${silver.src}");`;
+---
+
+<!doctype html>
+<html lang={lang} style={textureVars}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={alternates.find((alt) => alt.code === 'es')?.href}
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:locale" content={ogLocale} />
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">{t('a11y.skip')}</a>
+    {header !== 'none' && <Header overlay={header === 'overlay'} />}
+    {
+      wrapMain ? (
+        <main id="main-content" transition:animate={fade({ duration: '300ms' })}>
+          <slot />
+        </main>
+      ) : (
+        <slot />
+      )
+    }
+    {footer !== 'none' && <Footer variant={footer} />}
+  </body>
+</html>

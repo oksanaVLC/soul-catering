@@ -1,0 +1,158 @@
+---
+import { icon } from '@fortawesome/fontawesome-svg-core';
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { getLangFromUrl, isPublished, languages, switchLangPath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const globe = icon(faGlobe, { attributes: { 'aria-hidden': 'true' } }).html.join('');
+---
+
+<details class="langdd" data-langdd>
+  <summary aria-label={t('lang.label', { current: t(`lang.${lang}`) })}>
+    <Fragment set:html={globe} />
+    <span>{lang.toUpperCase()}</span>
+    <svg
+      class="chev"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.4"
+      stroke-linecap="round"
+      aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg
+    >
+  </summary>
+  <ul>
+    {
+      languages.map((code) => (
+        <li>
+          {isPublished(code) ? (
+            <a
+              href={switchLangPath(Astro.url.pathname, code)}
+              lang={code}
+              hreflang={code}
+              aria-current={code === lang ? 'true' : undefined}
+            >
+              {t(`lang.${code}`)}
+            </a>
+          ) : (
+            <a class="is-pending" lang={code}>
+              {t(`lang.${code}`)}
+              <span class="sr-only" lang={lang}> {t('a11y.pending')}</span>
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</details>
+
+<style>
+  .langdd {
+    position: relative;
+  }
+
+  summary {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 50px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: none;
+    border: 0;
+    color: var(--ink);
+    font: 600 16px var(--font-sans);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  @media (max-width: 360px) {
+    summary {
+      gap: 6px;
+      padding: 0 6px;
+    }
+  }
+
+  summary :global(.fa-globe) {
+    font-size: 22px;
+  }
+
+  [open] .chev {
+    transform: rotate(180deg);
+  }
+
+  ul {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(20, 20, 20, 0.16);
+    min-width: 210px;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  ul a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 50px;
+    padding: 0 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  ul a.is-pending {
+    cursor: default;
+  }
+
+  ul a[href]:hover,
+  ul a[aria-current] {
+    background: var(--menu-hover);
+  }
+
+  ul a[aria-current] {
+    font-weight: 700;
+  }
+
+  ul a[aria-current]::after {
+    content: '\2713';
+    color: var(--gold);
+  }
+</style>
+
+<script>
+  // Close with Esc (focus returns to the summary) and when clicking outside.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll<HTMLDetailsElement>('[data-langdd][open]').forEach((dd) => {
+      dd.open = false;
+      dd.querySelector('summary')?.focus();
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll<HTMLDetailsElement>('[data-langdd][open]').forEach((dd) => {
+      if (!dd.contains(e.target as Node)) dd.open = false;
+    });
+  });
+</script>

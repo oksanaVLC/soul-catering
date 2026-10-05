@@ -1,0 +1,489 @@
+---
+// «La plataforma»: 7 cards whose «images» are mini-screens made in HTML/CSS (not photos).
+// The mini-screens are decorative illustrations (aria-hidden) with the design's demo data;
+// that is why some of their texts are smaller than 15px, as in the design.
+import Slider from '../ui/Slider.astro';
+import Button from '../ui/Button.astro';
+import { DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS, LOCALE } from '../../data/config';
+import { formatCents, percentOfCents } from '../../lib/money';
+import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const slides = [1, 2, 3, 4, 5, 6, 7] as const;
+
+// Mini-calendar (decorative): November 2026 as in the design, Monday 2 to Saturday 28.
+const calDays = Array.from({ length: 28 }, (_, i) => i + 1);
+const calFull = [7, 14, 15, 21, 28];
+const calSelected = 6;
+
+// Mini-screen 7 (decorative): example total from the design (4.000 €), with the configured deposit.
+const mockTotal = 400000; // cents
+const mockPaid = percentOfCents(mockTotal, DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS);
+const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: true });
+---
+
+<section id="plataforma" class="silver section" aria-labelledby="plataforma-title">
+  <div class="container head">
+    <p class="eyebrow">{t('home.platform.eyebrow')}</p>
+    <h2 id="plataforma-title">{t('home.platform.title')}</h2>
+  </div>
+  <Slider
+    prevLabel={t('home.platform.prev')}
+    nextLabel={t('home.platform.next')}
+    arrowTop="40%"
+    trackClass="track"
+  >
+    {
+      slides.map((n) => (
+        <li class="slide">
+          <div class="mock paperbg" aria-hidden="true">
+            <div class="mock-card">
+              {n === 1 && (
+                <>
+                  <div class="mock-h">
+                    <span>Menú Banquete</span>
+                    <span class="mute">[PRECIO] €/pers.</span>
+                  </div>
+                  <div class="mrow">
+                    <span>Tartaletas de remolacha</span>
+                    <span class="chip-s">Gluten</span>
+                  </div>
+                  <div class="mrow">
+                    <span>Brochetas de fruta</span>
+                    <span class="chip-s ok">Sin alérgenos</span>
+                  </div>
+                  <div class="mrow">
+                    <span>Brownie con menta</span>
+                    <span class="chip-s">Huevo</span>
+                  </div>
+                  <div class="mock-btn">Elegir este menú</div>
+                </>
+              )}
+              {n === 2 && (
+                <>
+                  <div class="mock-h">Invitados</div>
+                  <div class="mrow">
+                    <span>Adultos</span>
+                    <span class="stepper">
+                      <span>−</span>
+                      <strong>80</strong>
+                      <span>+</span>
+                    </span>
+                  </div>
+                  <div class="mrow">
+                    <span>Niños</span>
+                    <span class="stepper">
+                      <span>−</span>
+                      <strong>10</strong>
+                      <span>+</span>
+                    </span>
+                  </div>
+                  <div class="mock-h top">
+                    <span>Total estimado</span>
+                    <span>[IMPORTE] €</span>
+                  </div>
+                </>
+              )}
+              {n === 3 && (
+                <>
+                  <div class="mock-h">
+                    <span>‹</span>
+                    <span>Noviembre 2026</span>
+                    <span>›</span>
+                  </div>
+                  <div class="cal">
+                    {calDays.map((d) => (
+                      <span
+                        class:list={[
+                          'cal-d',
+                          { sel: d === calSelected, full: calFull.includes(d) },
+                        ]}
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                  <div class="small mute">Tu fecha: viernes 6</div>
+                </>
+              )}
+              {n === 4 && (
+                <>
+                  <div class="mock-h">Lugar del evento</div>
+                  <div class="box mute">Finca [NOMBRE], Camí…</div>
+                  <div class="box">Valencia</div>
+                  <div class="two">
+                    <span class="box center">Interior</span>
+                    <span class="box center on">Exterior</span>
+                  </div>
+                </>
+              )}
+              {n === 5 && (
+                <>
+                  <div class="mock-h">
+                    <span>Invitados</span>
+                    <span class="small mute">96 de 120 confirmados</span>
+                  </div>
+                  <div class="mrow">
+                    <span>Carmen López</span>
+                    <span class="chip-s ok">Confirmado</span>
+                  </div>
+                  <div class="mrow">
+                    <span>Pablo Ruiz</span>
+                    <span class="chip-s wait">Pendiente</span>
+                  </div>
+                  <div class="mrow">
+                    <span>Anna Petrova</span>
+                    <span class="chip-s ok">Confirmado</span>
+                  </div>
+                  <div class="mrow">
+                    <span>Claire Dubois</span>
+                    <span class="chip-s wait">Pendiente</span>
+                  </div>
+                </>
+              )}
+              {n === 6 && (
+                <>
+                  <div class="mock-h">Mis alergias · Anna P.</div>
+                  {[
+                    ['Gluten', false],
+                    ['Lácteos', true],
+                    ['Huevo', true],
+                    ['Frutos secos', false],
+                    ['Marisco', false],
+                  ].map(([name, on]) => (
+                    <div class="tick-row">
+                      <span class:list={['tick', { on }]}>{on ? '✓' : ''}</span>
+                      {name}
+                    </div>
+                  ))}
+                  <div class="small sent">Enviado a cocina</div>
+                </>
+              )}
+              {n === 7 && (
+                <>
+                  <div class="mock-h">
+                    <span>Pagado hasta ahora</span>
+                    <span>{DEPOSIT_PERCENT}%</span>
+                  </div>
+                  <div class="big">{eur(mockPaid)}</div>
+                  <div class="bar">
+                    <div style={`width:${DEPOSIT_PERCENT}%`} />
+                  </div>
+                  <div class="small mute">
+                    Quedan {eur(mockTotal - mockPaid)} de {eur(mockTotal)}
+                  </div>
+                  <div class="mrow plain">
+                    <span class="chip-s ok">Señal pagada</span>
+                    <span class="chip-s wait">Resto pendiente</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          <div class="pcard-body">
+            <span class="pnum">{String(n).padStart(2, '0')}</span>
+            <h3>{t(`home.platform.p${n}Title`)}</h3>
+            <p>{t(`home.platform.p${n}Text`)}</p>
+          </div>
+        </li>
+      ))
+    }
+  </Slider>
+  <div class="container foot-row">
+    <p>{t('common.swipe')}</p>
+    <Button href={localizePath('/reserva', lang)}>{t('home.platform.cta')}</Button>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 130px 0 110px;
+    color: var(--ink);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 52px;
+  }
+
+  .head h2 {
+    max-width: 720px;
+  }
+
+  .slide {
+    flex: 0 0 min(380px, 82%);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 34px rgba(20, 20, 20, 0.12);
+  }
+
+  .mock {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    overflow: hidden;
+  }
+
+  .mock-card {
+    width: 100%;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 14px 40px rgba(20, 20, 20, 0.12);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .mock-h {
+    font-weight: 700;
+    font-size: 17px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .mock-h.top {
+    margin-top: 6px;
+  }
+
+  .mute {
+    color: var(--muted);
+  }
+
+  .mock-h .mute {
+    font-size: 15px;
+  }
+
+  .small {
+    font-size: 14px;
+  }
+
+  .mrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .mrow.plain {
+    border: 0;
+  }
+
+  .chip-s {
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 3px 10px;
+    background: var(--chip-bg);
+    color: var(--chip-text);
+    white-space: nowrap;
+  }
+
+  .chip-s.ok {
+    background: var(--ok-bg);
+    color: var(--ok);
+  }
+
+  .chip-s.wait {
+    background: var(--wait-bg);
+    color: var(--wait);
+  }
+
+  .mock-btn {
+    margin-top: 6px;
+    background: var(--ink);
+    color: var(--white);
+    border-radius: 999px;
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+  }
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .stepper span {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid var(--field-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stepper strong {
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .cal {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .cal-d {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--line);
+  }
+
+  .cal-d.sel {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+  }
+
+  .cal-d.full {
+    background: var(--mock-bg);
+    border-color: var(--mock-bg);
+    color: var(--mock-disabled);
+    text-decoration: line-through;
+  }
+
+  .box {
+    border: 1.5px solid var(--field-border-soft);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .box.on {
+    border: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .tick-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .tick {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1.5px solid var(--field-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .tick.on {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+  }
+
+  .sent {
+    color: var(--ok);
+    font-weight: 600;
+  }
+
+  .big {
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  .bar {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--mock-bg);
+    overflow: hidden;
+  }
+
+  .bar div {
+    height: 100%;
+    background: var(--ink);
+  }
+
+  .pcard-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 28px 30px;
+    flex: 1;
+  }
+
+  .pnum {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+  }
+
+  .pcard-body h3 {
+    font-size: 36px;
+  }
+
+  .pcard-body p {
+    color: var(--text-2);
+  }
+
+  .foot-row {
+    margin-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .foot-row p {
+    font-size: 17px;
+    color: var(--text-2);
+  }
+
+  @media (max-width: 700px) {
+    .section {
+      padding: 88px 0 72px;
+    }
+
+    .head {
+      margin-bottom: 36px;
+    }
+
+    .mock {
+      padding: 20px;
+    }
+  }
+</style>

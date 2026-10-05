@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import Services from '../components/home/Services.astro';
+import About from '../components/home/About.astro';
+import BookingSteps from '../components/home/BookingSteps.astro';
+import Extras from '../components/home/Extras.astro';
+import Platform from '../components/home/Platform.astro';
+import BlogTeaser from '../components/home/BlogTeaser.astro';
+import Testimonials from '../components/home/Testimonials.astro';
+import Faq from '../components/home/Faq.astro';
+import Contact from '../components/home/Contact.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<BaseLayout title={t('home.title')} header="overlay" footer="full">
+  <Hero />
+  <Services />
+  <About />
+  <BookingSteps />
+  <Extras />
+  <Platform />
+  <BlogTeaser />
+  <Testimonials />
+  <Faq />
+  <Contact />
+</BaseLayout>

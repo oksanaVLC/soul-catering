@@ -1,0 +1,181 @@
+---
+// «Seis pasos, sin llamadas» band: the six steps of the approved booking (CLAUDE.md §5).
+import { Image } from 'astro:assets';
+import aceitunas from '../../assets/images/aceitunas-tablas.jpg';
+import Button from '../ui/Button.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const steps = [1, 2, 3, 4, 5, 6] as const;
+---
+
+<section id="como-funciona" class="silver band" aria-labelledby="pasos-title">
+  <Image
+    src={aceitunas}
+    alt={t('home.steps.alt')}
+    widths={[640, 960, 1280]}
+    sizes="(max-width: 1080px) 100vw, 50vw"
+    loading="lazy"
+    class="photo"
+  />
+  <div class="body">
+    <div class="head">
+      <p class="eyebrow">{t('home.steps.eyebrow')}</p>
+      <h2 id="pasos-title">{t('home.steps.title')}</h2>
+    </div>
+    <ol>
+      {
+        steps.map((n) => (
+          <li>
+            <span class="num serif" aria-hidden="true">
+              {String(n).padStart(2, '0')}
+            </span>
+            <div>
+              <h3>{t(`home.steps.s${n}Title`)}</h3>
+              <p>
+                {t(`home.steps.s${n}Text`)}
+                {n === 5 && (
+                  <>
+                    {' '}
+                    <a href="#extras">{t('home.steps.s5Link')}</a>
+                  </>
+                )}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="secure">
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+        <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+      </svg>
+      <span><strong>{t('home.steps.secureStrong')}</strong> {t('home.steps.secureText')}</span>
+    </p>
+    <Button href={localizePath('/reserva', lang)}>{t('home.steps.cta')}</Button>
+  </div>
+</section>
+
+<style>
+  .band {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    color: var(--text);
+  }
+
+  .photo {
+    flex: 1 1 520px;
+    min-height: 520px;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    object-position: left center;
+    min-width: 0;
+  }
+
+  .body {
+    flex: 1 1 520px;
+    padding: 110px clamp(24px, 6vw, 96px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    min-width: 0;
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  h2 {
+    font-size: clamp(40px, 4.4vw, 60px);
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+  }
+
+  li {
+    display: flex;
+    gap: 24px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(20, 20, 20, 0.18);
+  }
+
+  li:last-child {
+    border-bottom: 1px solid rgba(20, 20, 20, 0.18);
+  }
+
+  .num {
+    font-size: 40px;
+    color: var(--gold);
+    min-width: 56px;
+  }
+
+  h3 {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+
+  li p {
+    margin-top: 4px;
+    color: var(--text-2);
+  }
+
+  li a {
+    color: var(--gold);
+    font-weight: 600;
+    text-underline-offset: 4px;
+  }
+
+  .secure {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    max-width: 360px;
+  }
+
+  .secure svg {
+    flex: none;
+    color: var(--gold);
+  }
+
+  .secure strong {
+    color: var(--ink);
+  }
+
+  @media (max-width: 700px) {
+    .photo {
+      min-height: 320px;
+    }
+
+    .body {
+      padding-top: 72px;
+      padding-bottom: 72px;
+    }
+  }
+</style>

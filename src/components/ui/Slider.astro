@@ -1,0 +1,151 @@
+---
+// Horizontal slider: CSS scroll-snap, swipeable, with thick arrows (<button>).
+// From 1400px the arrows sit in the margin without background; below, over the content in a light circle.
+interface Props {
+  prevLabel: string;
+  nextLabel: string;
+  /** Vertical position of the arrows (design: 34–40 %). */
+  arrowTop?: string;
+  /** Class of the <ul>: 'gal' (cards in thirds or quarters) or 'track' (fixed width). */
+  trackClass?: 'gal' | 'track';
+}
+
+const { prevLabel, nextLabel, arrowTop = '38%', trackClass = 'gal' } = Astro.props;
+---
+
+<div class="slider" style={`--at:${arrowTop}`} data-slider>
+  <button type="button" class="sarrow l" aria-label={prevLabel} data-slider-prev>
+    <svg
+      width="34"
+      height="34"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"><path d="M20 12H5M11 5l-7 7 7 7"></path></svg
+    >
+  </button>
+  <button type="button" class="sarrow r" aria-label={nextLabel} data-slider-next>
+    <svg
+      width="34"
+      height="34"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"></path></svg
+    >
+  </button>
+  <ul class={trackClass} data-slider-track>
+    <slot />
+  </ul>
+</div>
+
+<style>
+  .slider {
+    max-width: 1320px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  ul {
+    /* positioned: so absolute children (.sr-only) stay clipped inside the track */
+    position: relative;
+    display: flex;
+    gap: 28px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    list-style: none;
+    margin: 0;
+    padding: 4px 40px 28px;
+    scroll-padding-left: 40px;
+  }
+
+  ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .track {
+    padding-bottom: 24px;
+  }
+
+  .sarrow {
+    position: absolute;
+    top: var(--at, 38%);
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 60px;
+    height: 60px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 22px rgba(20, 20, 20, 0.18);
+    transition: transform 0.2s ease;
+  }
+
+  .sarrow.l {
+    left: 12px;
+  }
+
+  .sarrow.r {
+    right: 12px;
+  }
+
+  .sarrow:hover {
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  @media (min-width: 1400px) {
+    .sarrow {
+      background: none;
+      box-shadow: none;
+      width: 52px;
+    }
+
+    .sarrow.l {
+      left: -58px;
+    }
+
+    .sarrow.r {
+      right: -58px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    ul {
+      padding-left: 20px;
+      padding-right: 20px;
+      scroll-padding-left: 20px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ul {
+      scroll-behavior: auto;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('[data-slider]').forEach((slider) => {
+      const track = slider.querySelector<HTMLElement>('[data-slider-track]');
+      if (!track) return;
+      const go = (dir: number) =>
+        track.scrollBy({ left: dir * Math.max(300, track.clientWidth * 0.8), behavior: 'smooth' });
+      slider.querySelector('[data-slider-prev]')?.addEventListener('click', () => go(-1));
+      slider.querySelector('[data-slider-next]')?.addEventListener('click', () => go(1));
+    });
+  });
+</script>

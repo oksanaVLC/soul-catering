@@ -1,0 +1,65 @@
+---
+// −/+ counter. The value lives in the booking store; <output> only displays it.
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  value: number;
+  decLabel: string;
+  incLabel: string;
+}
+
+const { id, name, label, value, decLabel, incLabel } = Astro.props;
+---
+
+<div class="field">
+  <span class="legend" id={`${id}-label`}>{label}</span>
+  <div
+    class="counter"
+    role="group"
+    aria-labelledby={`${id}-label`}
+    data-counter={name}
+  >
+    <button type="button" aria-label={decLabel} data-step="-1">−</button>
+    <output id={id} aria-live="polite">{value}</output>
+    <button type="button" aria-label={incLabel} data-step="1">+</button>
+  </div>
+</div>
+
+<style>
+  .counter {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--field-border-a11y);
+    border-radius: 999px;
+    overflow: hidden;
+    width: max-content;
+    background: var(--white);
+  }
+
+  button {
+    width: 60px;
+    height: 60px;
+    border: 0;
+    background: var(--row-hover);
+    font-size: 28px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: var(--stepper-hover);
+  }
+
+  button:focus-visible {
+    outline-offset: -3px;
+  }
+
+  output {
+    min-width: 84px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+</style>

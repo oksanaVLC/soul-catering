@@ -1,0 +1,227 @@
+---
+// Contact: details with placeholders and a form with native validation.
+// On submit it only shows the simulated success message (sends nothing).
+import Button from '../ui/Button.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
+---
+
+<section id="contacto" class="silver section" aria-labelledby="contacto-title">
+  <div class="container wrap">
+    <div class="info">
+      <p class="eyebrow">{t('home.contact.eyebrow')}</p>
+      <h2 id="contacto-title">{t('home.contact.title')}</h2>
+      <p class="lead">{t('home.contact.text')}</p>
+      <dl>
+        <div>
+          <dt>{t('home.contact.phoneLabel')}</dt>
+          <dd>{t('home.contact.phone')}</dd>
+        </div>
+        <div>
+          <dt>{t('home.contact.emailLabel')}</dt>
+          <dd>{t('home.contact.email')}</dd>
+        </div>
+        <div>
+          <dt>{t('home.contact.addressLabel')}</dt>
+          <dd>{t('home.contact.address')}</dd>
+        </div>
+      </dl>
+      <div>
+        {/* Pending: no WhatsApp number yet. Placeholder link without href. */}
+        <a class="btn btn-light is-pending">
+          {t('home.contact.whatsapp')} <span class="sr-only">{t('a11y.pending')}</span>
+        </a>
+      </div>
+    </div>
+
+    <form class="form" data-contact-form>
+      <div class="status" role="status" data-contact-status hidden>
+        <strong>{t('home.contact.sentStrong')}</strong>
+        {t('home.contact.sentText')}
+      </div>
+      <div class="row row-2">
+        <div class="field">
+          <label for="c-nombre">{t('home.contact.name')}</label>
+          <input id="c-nombre" name="nombre" class="input" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="c-tel">{t('home.contact.tel')}</label>
+          <input id="c-tel" name="telefono" type="tel" class="input" autocomplete="tel" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="c-email">{t('home.contact.mail')}</label>
+        <input id="c-email" name="email" type="email" class="input" autocomplete="email" required />
+      </div>
+      <div class="row row-3">
+        <div class="field">
+          <label for="c-tipo">{t('home.contact.type')}</label>
+          <select id="c-tipo" name="tipo" class="input">
+            {eventTypes.map((type) => <option>{t(`eventType.${type}`)}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for="c-fecha">{t('home.contact.date')}</label>
+          <input id="c-fecha" name="fecha" type="date" class="input" />
+        </div>
+        <div class="field">
+          <label for="c-inv">{t('home.contact.guests')}</label>
+          <input id="c-inv" name="invitados" type="number" min="1" inputmode="numeric" class="input" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="c-msg">{t('home.contact.message')}</label>
+        <textarea id="c-msg" name="mensaje" class="input"></textarea>
+      </div>
+      <label class="accept">
+        <input type="checkbox" name="privacidad" required />
+        <span>
+          {t('home.contact.acceptBefore')}{' '}
+          <a class="is-pending">
+            {t('common.privacyPolicy')}<span class="sr-only"> {t('a11y.pending')}</span>
+          </a>.
+        </span>
+      </label>
+      <Button type="submit" class="submit">{t('home.contact.submit')}</Button>
+    </form>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 130px 0;
+  }
+
+  .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 56px;
+    align-items: flex-start;
+  }
+
+  .info {
+    flex: 1 1 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    min-width: 0;
+  }
+
+  h2 {
+    font-size: clamp(40px, 4.4vw, 60px);
+  }
+
+  .lead {
+    font-size: 19px;
+  }
+
+  dl {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font-size: 19px;
+  }
+
+  dt {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .form {
+    flex: 1.4 1 520px;
+    min-width: 0;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .row {
+    display: grid;
+    gap: 22px;
+  }
+
+  .row-2 {
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  }
+
+  .row-3 {
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  }
+
+  .status {
+    background: var(--mock-ok-bg);
+    border-radius: 8px;
+    padding: 18px 20px;
+    font-size: 19px;
+    color: var(--ink);
+  }
+
+  .status[hidden] {
+    display: none;
+  }
+
+  .accept {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 17px;
+    cursor: pointer;
+  }
+
+  .accept input {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--ink);
+    flex: none;
+    margin: 2px 0 0;
+  }
+
+  .accept a {
+    text-decoration: underline;
+  }
+
+  .form :global(.submit) {
+    align-self: flex-start;
+  }
+
+  @media (max-width: 700px) {
+    .section {
+      padding: 88px 0;
+    }
+
+    .form {
+      padding: 28px 20px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!form) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const status = form.querySelector<HTMLElement>('[data-contact-status]');
+      if (status) {
+        status.hidden = false;
+        status.scrollIntoView({ block: 'center' });
+      }
+    });
+  });
+</script>

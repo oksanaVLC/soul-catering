@@ -1,0 +1,71 @@
+---
+import BlogCard from '../ui/BlogCard.astro';
+import Button from '../ui/Button.astro';
+import { homePosts } from '../../data/blog';
+import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section class="paperbg section" aria-labelledby="blog-title">
+  <div class="container inner">
+    <div class="head">
+      <div class="titles">
+        <p class="eyebrow">{t('home.blog.eyebrow')}</p>
+        <h2 id="blog-title">{t('home.blog.title')}</h2>
+      </div>
+      <Button href={localizePath('/blog', lang)} variant="light">{t('home.blog.cta')}</Button>
+    </div>
+    <div class="grid">
+      {homePosts.map((post) => <BlogCard post={post} variant="teaser" />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 130px 0;
+    background: var(--bg);
+  }
+
+  .inner {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  .titles {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  h2 {
+    font-size: clamp(40px, 4.4vw, 56px);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: 40px;
+  }
+
+  @media (max-width: 700px) {
+    .section {
+      padding: 88px 0;
+    }
+
+    .inner {
+      gap: 40px;
+    }
+  }
+</style>

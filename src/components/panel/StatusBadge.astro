@@ -1,0 +1,42 @@
+---
+// Attendance badge. The status is always told by the TEXT, not only by the color.
+import type { Attendance } from '../../types/guest';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  status: Attendance;
+}
+
+const { status } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<span class:list={['badge', status]} data-status={status}>{t(`panel.status.${status}`)}</span>
+
+<style>
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 5px 14px;
+    white-space: nowrap;
+  }
+
+  .confirmed {
+    background: var(--ok-bg);
+    color: var(--ok);
+  }
+
+  .pending {
+    background: var(--wait-bg);
+    color: var(--wait);
+  }
+
+  .declined {
+    background: var(--panel-avatar-bg);
+    color: var(--text-6);
+  }
+</style>

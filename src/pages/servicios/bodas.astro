@@ -1,0 +1,584 @@
+---
+// /servicios/bodas: the only service with an approved design.
+// [PRECIO], [MÍN]–[MÁX], [NOMBRE]… are design placeholders (no prices are made up).
+// «Paso a paso» is the process of a wedding, NOT the booking flow (CLAUDE.md §5).
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/ui/PageHero.astro';
+import FaqList from '../../components/ui/FaqList.astro';
+import Button from '../../components/ui/Button.astro';
+import noviosTarta from '../../assets/images/novios-tarta.webp';
+import bandejaEspejo from '../../assets/images/bandeja-espejo.webp';
+import servilletaLazo from '../../assets/images/servilleta-lazo.webp';
+import mesaDulce from '../../assets/images/mesa-dulce.jpg';
+import canapesRemolacha from '../../assets/images/canapes-remolacha.webp';
+import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const bookHref = localizePath('/reserva', lang);
+
+const moments = [
+  { image: bandejaEspejo, n: 1 },
+  { image: servilletaLazo, n: 2 },
+  { image: mesaDulce, n: 3 },
+] as const;
+
+// Example menu from the design (dish names and placeholders).
+const menuGroups = [
+  {
+    title: t('bodas.menuCocktail'),
+    dishes: [
+      { name: 'Tartaletas de remolacha', allergens: ['Gluten', 'Lácteos'] },
+      { name: 'Mini brochetas de fruta y coco', allergens: [] },
+    ],
+  },
+  {
+    title: t('bodas.menuBanquet'),
+    dishes: [
+      { name: '[ENTRANTE]', allergens: ['[ALÉRGENOS]'] },
+      { name: '[PLATO PRINCIPAL]', allergens: ['[ALÉRGENOS]'] },
+      { name: 'Brownie con menta', allergens: ['Huevo', 'Gluten'] },
+    ],
+  },
+];
+
+const extraRows = [
+  ['Floristería', 'Decoración básica, premium y centros de mesa'],
+  ['Fotografía', 'Cobertura básica, completa o vídeo profesional'],
+  ['Personal extra', 'Camareros adicionales y coordinador de evento'],
+  ['Detalles para invitados', 'Regalos y detalles personalizados'],
+];
+
+const process = [
+  ['Reserva online', 'Menú orientativo, invitados, fecha y lugar.'],
+  ['Señal y fecha bloqueada', 'La fecha queda confirmada al recibir la señal.'],
+  ['Degustación', 'Probáis el menú y cerramos los detalles.'],
+  ['Invitados y alergias', 'Subís la lista y cada alergia queda registrada.'],
+];
+
+const faq = [
+  {
+    q: '¿Con cuánta antelación debemos reservar?',
+    a: '[RESPUESTA — p. ej. recomendamos entre X y Y meses en temporada alta.]',
+  },
+  {
+    q: '¿Cuánto es la señal y cuándo se paga el resto?',
+    a: '[PORCENTAJE DE SEÑAL] al reservar; el resto antes del evento.',
+  },
+  {
+    q: '¿Adaptáis el menú a alergias e intolerancias?',
+    a: 'Sí. Cada invitado puede indicar sus alergias y las tenemos en cuenta plato a plato.',
+  },
+  { q: '¿Trabajáis fuera de Valencia ciudad?', a: '[ZONA DE SERVICIO]' },
+];
+---
+
+<BaseLayout title={t('bodas.title')} footer="compact">
+  <PageHero
+    image={noviosTarta}
+    alt={t('bodas.heroAlt')}
+    position="center 30%"
+    padTop={420}
+    padBottom={72}
+  >
+    <nav aria-label={t('common.breadcrumb')} class="breadcrumbs">
+      <a href={localizePath('/', lang)}>{t('common.home')}</a>
+      <span aria-hidden="true">/</span>
+      <a href={`${localizePath('/', lang)}#servicios`}>{t('bodas.breadcrumbServices')}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{t('bodas.breadcrumbCurrent')}</span>
+    </nav>
+    <p class="eyebrow">{t('bodas.eyebrow')}</p>
+    <h1 class="h1">{t('bodas.h1')}</h1>
+    <p class="lead hero-lead">{t('bodas.lead')}</p>
+    <div class="ctas">
+      <Button href={bookHref}>{t('bodas.ctaDate')}</Button>
+      <Button href="#menu" variant="light">{t('bodas.ctaMenu')}</Button>
+    </div>
+  </PageHero>
+
+  <!-- Key data -->
+  <section class="keys">
+    <div class="container keys-grid">
+      <div>
+        <p class="eyebrow">{t('bodas.keyGuests')}</p>
+        <p class="serif key">{t('bodas.keyGuestsValue')}</p>
+      </div>
+      <div>
+        <p class="eyebrow">{t('bodas.keyPrice')}</p>
+        <p class="serif key">{t('bodas.keyPriceValue')}</p>
+      </div>
+      <div>
+        <p class="eyebrow">{t('bodas.keyIncludes')}</p>
+        <p class="key-text">{t('bodas.keyIncludesValue')}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Moments of the day -->
+  <section class="block" aria-labelledby="momentos-title">
+    <div class="container stack">
+      <div class="head">
+        <p class="eyebrow">{t('bodas.momentsEyebrow')}</p>
+        <h2 id="momentos-title">{t('bodas.momentsTitle')}</h2>
+      </div>
+      <div class="moments">
+        {
+          moments.map((m) => (
+            <article>
+              <Image
+                src={m.image}
+                alt={t(`bodas.m${m.n}Alt`)}
+                widths={[400, 600, 800]}
+                sizes="(max-width: 760px) 100vw, 380px"
+                loading="lazy"
+              />
+              <h3>{t(`bodas.m${m.n}Title`)}</h3>
+              <p>{t(`bodas.m${m.n}Text`)}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Example menu -->
+  <section id="menu" class="paperbg block" aria-labelledby="menu-title">
+    <div class="container menu-grid">
+      <div class="menu-intro">
+        <p class="eyebrow">{t('bodas.menuEyebrow')}</p>
+        <h2 id="menu-title">{t('bodas.menuTitle')}</h2>
+        <p class="lead">{t('bodas.menuLead')}</p>
+        <Image
+          src={canapesRemolacha}
+          alt={t('bodas.menuAlt')}
+          widths={[500, 800, 1100]}
+          sizes="(max-width: 960px) 100vw, 560px"
+          loading="lazy"
+          class="menu-photo"
+        />
+      </div>
+      <div class="menu-card">
+        <div class="menu-top">
+          <h3>{t('bodas.menuName')}</h3>
+          <span class="menu-price">{t('bodas.menuPrice')}</span>
+        </div>
+        {
+          menuGroups.map((group) => (
+            <div class="group">
+              <p class="eyebrow">{group.title}</p>
+              <ul>
+                {group.dishes.map((dish) => (
+                  <li>
+                    <span>{dish.name}</span>
+                    <span class="allergens">
+                      {dish.allergens.length ? (
+                        dish.allergens.map((a) => <span class="allergen">{a}</span>)
+                      ) : (
+                        <span class="none">{t('bodas.noAllergens')}</span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+        <Button href={bookHref} class="menu-cta">{t('bodas.menuCta')}</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Additional services -->
+  <section class="block white" aria-labelledby="adicionales-title">
+    <div class="container stack">
+      <div class="head">
+        <p class="eyebrow">{t('bodas.extrasEyebrow')}</p>
+        <h2 id="adicionales-title">{t('bodas.extrasTitle')}</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">{t('bodas.extrasColService')}</th>
+              <th scope="col">{t('bodas.extrasColIncludes')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              extraRows.map(([service, includes]) => (
+                <tr>
+                  <th scope="row">{service}</th>
+                  <td>{includes}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wedding process (not the booking flow) -->
+  <section class="block" aria-labelledby="proceso-title">
+    <div class="container stack">
+      <div class="head">
+        <p class="eyebrow">{t('bodas.processEyebrow')}</p>
+        <h2 id="proceso-title">{t('bodas.processTitle')}</h2>
+      </div>
+      <ol class="process">
+        {
+          process.map(([title, text], i) => (
+            <li>
+              <span class="step-n">{t('bodas.processStep', { n: i + 1 })}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="block white faq" aria-labelledby="faq-bodas-title">
+    <div class="container faq-grid">
+      <div class="head">
+        <p class="eyebrow">{t('bodas.faqEyebrow')}</p>
+        <h2 id="faq-bodas-title">{t('bodas.faqTitle')}</h2>
+      </div>
+      <FaqList items={faq} />
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="paperbg block cta" aria-labelledby="cta-title">
+    <div class="container cta-inner">
+      <h2 id="cta-title">{t('bodas.ctaTitle')}</h2>
+      <p class="lead">{t('bodas.ctaText')}</p>
+      <Button href={bookHref}>{t('bodas.ctaButton')}</Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .h1 {
+    font-size: clamp(50px, 6vw, 88px);
+    max-width: 900px;
+  }
+
+  .hero-lead {
+    max-width: 720px;
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  h2 {
+    font-size: clamp(40px, 4.4vw, 58px);
+  }
+
+  .keys {
+    background: var(--white);
+    padding: 96px 0;
+    border-top: 1px solid var(--line-header);
+    border-bottom: 1px solid var(--line-header);
+  }
+
+  .keys-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 48px;
+  }
+
+  .keys-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .key {
+    font-size: 40px;
+    line-height: 1.15;
+  }
+
+  .key-text {
+    font-size: 20px;
+    color: var(--ink);
+  }
+
+  .block {
+    padding: 130px 0;
+  }
+
+  .white {
+    background: var(--white);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 720px;
+  }
+
+  .moments {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+    gap: 48px 40px;
+  }
+
+  .moments article {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .moments :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+
+  .moments h3 {
+    font-size: 34px;
+  }
+
+  .moments p,
+  .process p {
+    color: var(--muted);
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    gap: 64px;
+    align-items: start;
+  }
+
+  .menu-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .menu-intro :global(.menu-photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-top: 12px;
+  }
+
+  .menu-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .menu-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px 16px;
+    flex-wrap: wrap;
+  }
+
+  .menu-top h3 {
+    font-size: 38px;
+  }
+
+  .menu-price {
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .group li {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line-header);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .allergens {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .allergen {
+    display: inline-flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--allergen);
+    background: var(--allergen-bg);
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+
+  .none {
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .menu-card :global(.menu-cta) {
+    align-self: flex-start;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 19px;
+    min-width: 560px;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 16px 0;
+    border-bottom: 2px solid var(--ink);
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  tbody th {
+    text-align: left;
+    padding: 24px 24px 24px 0;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  tbody td {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .process {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+    gap: 40px;
+  }
+
+  .process li {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-top: 2px solid var(--ink);
+    padding-top: 24px;
+  }
+
+  .step-n {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+
+  .process h3 {
+    font-family: var(--font-sans);
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.3;
+  }
+
+  .faq {
+    padding: 120px 0;
+  }
+
+  .faq h2 {
+    font-size: clamp(40px, 4.4vw, 56px);
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+    gap: 64px;
+  }
+
+  .faq :global(details.faq p) {
+    color: var(--muted);
+  }
+
+  .cta-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 26px;
+  }
+
+  .cta h2 {
+    font-size: clamp(42px, 5vw, 66px);
+    max-width: 820px;
+  }
+
+  .cta .lead {
+    max-width: 560px;
+  }
+
+  @media (max-width: 700px) {
+    .block,
+    .faq {
+      padding: 88px 0;
+    }
+
+    .keys {
+      padding: 64px 0;
+    }
+
+    .stack {
+      gap: 40px;
+    }
+
+    .menu-card {
+      padding: 28px 20px;
+    }
+
+    .key {
+      font-size: 34px;
+    }
+  }
+</style>

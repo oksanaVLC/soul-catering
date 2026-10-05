@@ -1,0 +1,116 @@
+---
+import Button from '../ui/Button.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section class="hero" aria-label={t('home.hero.label')}>
+  <video
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    poster="/video/hero-poster.jpg"
+    aria-hidden="true"
+    tabindex="-1"
+  >
+    <source src="/video/hero.mp4" type="video/mp4" />
+  </video>
+  <div class="veil" aria-hidden="true"></div>
+  <div class="container content">
+    <div class="copy">
+      <p class="eyebrow">{t('home.hero.eyebrow')}</p>
+      <h1>{t('home.hero.title')}</h1>
+      <p class="text">{t('home.hero.text')}</p>
+      <div class="ctas">
+        <Button href={localizePath('/reserva', lang)}>{t('home.hero.ctaBook')}</Button>
+        <Button href="#servicios">{t('home.hero.ctaServices')}</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    height: 100svh;
+    min-height: 640px;
+    overflow: hidden;
+    background: var(--progress-bg);
+  }
+
+  video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* White layer at 22 % (lighten, not darken) */
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: var(--white);
+    opacity: 0.22;
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 96px;
+  }
+
+  .copy {
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .eyebrow,
+  h1,
+  .text {
+    color: var(--hero-text);
+  }
+
+  h1 {
+    font-size: clamp(52px, 7.6vw, 104px);
+  }
+
+  .text {
+    font-size: 22px;
+    line-height: 1.6;
+    max-width: 600px;
+    font-weight: 500;
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 700px) {
+    .content {
+      padding-bottom: 56px;
+    }
+
+    .copy {
+      gap: 20px;
+    }
+
+    .text {
+      font-size: 20px;
+    }
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+// Administration area layout: its own structure (sidebar + content), without the public
+// header or footer. It reuses BaseLayout for <head>, SEO, fonts and transitions.
+// DEMO: the panel is NOT protected (no real authentication or roles yet).
+import { fade } from 'astro:transitions';
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/panel/Sidebar.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<BaseLayout title={title} header="none" footer="none" wrapMain={false}>
+  <div class="panel-shell">
+    <Sidebar />
+    <main id="main-content" class="panel-main" transition:animate={fade({ duration: '300ms' })}>
+      <slot />
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .panel-shell {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100vh;
+    align-items: stretch;
+    font-size: 18px;
+    line-height: 1.55;
+  }
+
+  .panel-main {
+    flex: 999 1 640px;
+    min-width: 0;
+    padding: 36px 44px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  @media (max-width: 1040px) {
+    .panel-main {
+      flex-basis: 100%;
+      padding: 28px 20px 56px;
+    }
+  }
+</style>

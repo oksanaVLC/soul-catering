@@ -1,0 +1,60 @@
+---
+import FaqList from '../ui/FaqList.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const items = ([1, 2, 3, 4] as const).map((n) => ({
+  q: t(`home.faq.q${n}`),
+  a: t(`home.faq.a${n}`),
+}));
+---
+
+<section class="paperbg section" aria-labelledby="faq-title">
+  <div class="container grid">
+    <div class="intro">
+      <p class="eyebrow">{t('home.faq.eyebrow')}</p>
+      <h2 id="faq-title">{t('home.faq.title')}</h2>
+      <p class="lead">
+        {t('home.faq.textBefore')} <a href="#contacto">{t('home.faq.textLink')}</a>.
+      </p>
+    </div>
+    <FaqList items={items} />
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 130px 0;
+    background: var(--surface);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+    gap: 64px;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  h2 {
+    font-size: clamp(40px, 4.4vw, 58px);
+  }
+
+  .lead {
+    font-size: 19px;
+  }
+
+  @media (max-width: 700px) {
+    .section {
+      padding: 88px 0;
+    }
+
+    .grid {
+      gap: 40px;
+    }
+  }
+</style>

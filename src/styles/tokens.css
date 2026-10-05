@@ -1,0 +1,103 @@
+/* Soul Catering design tokens.
+   Base: CLAUDE.md §6. Auxiliary: tones that appear in the design export
+   (design/Soul Catering — Web.html), with their original value. */
+
+:root {
+  /* ── Base (CLAUDE.md §6) ── */
+  --bg: #f6f2e9; /* general background */
+  --bg-header: #fbf8f2; /* header */
+  --surface: #fffdf8; /* cards */
+  --white: #ffffff;
+  --ink: #141414; /* headings, buttons, footer */
+  --text: #2b2b28;
+  --text-2: #3a3934;
+  --muted: #55554f; /* minimum for text */
+  --gold: #6e5a1e; /* labels (eyebrow) */
+  --accent: #b8963e; /* details, focus */
+  --straw: #e9dcb8;
+  --line: #dad6cc;
+  --silver-base: #ededec;
+  --hero-text: #3a2418;
+
+  /* states */
+  --ok-bg: #e3ebdd;
+  --ok: #2f4a26;
+  --wait-bg: #f6ead3;
+  --wait: #6e4b12;
+  --allergen-bg: #f3eadb;
+  --allergen: #5b4422;
+
+  /* ── Auxiliary from the design ── */
+
+  /* lines and borders */
+  --line-header: #e6e0d2; /* bottom border of the header, separators */
+  --line-strong: #d3cec2; /* FAQ, tables, secondary borders */
+  --line-soft: #eee9dd; /* rows inside mini-screens */
+  --line-card: #eee8dc; /* border of service cards */
+  --line-panel: #efe9df; /* panel and access separators */
+  --line-chip: #cfc6b6; /* filter and blog chip borders */
+  --line-dark: #3c3b37; /* lines on dark footer */
+
+  /* form fields */
+  --field-border: #9d9a90; /* design value: 2.82:1 on white (does NOT reach 3:1) */
+  --field-border-a11y: #8f8c83; /* accessible variant: 3.36:1 on white, 3.01:1 on --bg */
+  --field-border-soft: #cfcbc1; /* secondary field border; also text on dark footer */
+
+  /* hovers and states */
+  --ink-2: #111111; /* dark text in some blocks (Blog, Bodas, Reserva) */
+  --ink-hover: #2e2d29; /* hover on black buttons */
+  --light-hover: #f0eadb; /* hover on white/secondary buttons */
+  --straw-hover: #f2e8cc; /* hover on straw button */
+  --menu-hover: #f3eee2; /* hover / active in language dropdown */
+  --row-hover: #f3eee6; /* hover in lists and tables */
+  --table-hover: #fbf9f5; /* hover on panel rows */
+  --google-hover: #f6f3ee; /* hover on «Entrar con Google» button */
+  --stepper-hover: #e8e1d5; /* hover on +/- buttons of the guest counter */
+
+  /* secondary backgrounds */
+  --mock-bg: #e9e4d6; /* mini-screens and photo placeholders */
+  --placeholder-grey: #d9dadb; /* gray placeholder «Foto pendiente» */
+  --cal-full-bg: #e9e4db; /* full days in the booking calendar */
+  --cal-legend-bg: #dcd4c6;
+  --chip-bg: #f1e7cc; /* small chips in mini-screens */
+  --chip-text: #5a4a12;
+  --mock-ok-bg: #eef0e6;
+  --soft-green-bg: #e6ebe0;
+  --panel-avatar-bg: #ece8e4;
+  --progress-bg: #d8d2c4;
+
+  /* text on dark footer */
+  --foot-text: #e8e3d6;
+  --foot-muted: #cfcbc1;
+  --foot-heading: #e2cf94;
+  --foot-light: #f4f1ea;
+
+  /* secondary texts (contrast to be checked in each phase where they are used) */
+  --text-3: #4a4842;
+  --text-4: #6b6860;
+  --text-5: #5f645f;
+  --text-6: #4f4744;
+  --mock-disabled: #8a877f; /* full days in decorative mini-calendars only */
+
+  /* PROVISIONAL (pending approval): validation error color. The design does not define one.
+     9.3:1 on white, 8.3:1 on --bg. Always accompanied by text, never color alone. */
+  --error: #8a1c1c;
+
+  /* calendar indicator «pocas plazas» (non-textual, accompanied by a dot and text) */
+  --few-dot: #b07a2a;
+
+  /* ── Typography ── */
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* ── Layout ── */
+  --container: 1240px;
+  --gutter: 40px;
+  --header-h: 104px;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --gutter: 20px;
+  }
+}

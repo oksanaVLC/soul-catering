@@ -1,0 +1,225 @@
+---
+// Side summary. It is a DERIVED representation of the booking state: in the initial HTML
+// it is painted with calculateSummary and in the browser BookingForm updates it on every change.
+// Amounts: local DEMO estimate; the server will have to recalculate them before any real payment.
+import type { ReservationSummary } from '../../types/reservation';
+import { formatCents } from '../../lib/money';
+import { formatLongDate } from '../../lib/dates';
+import { LOCALE } from '../../data/config';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  summary: ReservationSummary;
+}
+
+const { summary } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const money = (cents: number) => formatCents(cents, { locale: LOCALE });
+const place = [summary.venue.city.trim(), t(summary.venue.space === 'interior' ? 'booking.indoor' : 'booking.outdoor')]
+  .filter(Boolean)
+  .join(' · ');
+const hasCity = summary.venue.city.trim() !== '';
+---
+
+<aside class="summary" aria-labelledby="summary-title">
+  <h2 id="summary-title">{t('booking.summaryTitle')}</h2>
+  <dl>
+    <div class="row"><dt>{t('booking.sumMenu')}</dt><dd data-sum="menu">{summary.menu?.name ?? '—'}</dd></div>
+    <div class="row">
+      <dt>{t('booking.sumGuests')}</dt>
+      <dd data-sum="guests">
+        {t('booking.sumGuestsValue', { adults: summary.guests.adults, kids: summary.guests.kids })}
+      </dd>
+    </div>
+    <div class="row">
+      <dt>{t('booking.sumDate')}</dt>
+      <dd data-sum="date">{summary.date ? formatLongDate(summary.date, LOCALE) : t('booking.sumDateNone')}</dd>
+    </div>
+    <div class="row">
+      <dt>{t('booking.sumPlace')}</dt>
+      <dd data-sum="place">{hasCity ? place : t('booking.sumPlaceNone')}</dd>
+    </div>
+    <div class="row">
+      <dt>{t('booking.sumExtras')}</dt>
+      <dd data-sum="extras">
+        {summary.extras.length
+          ? t('booking.sumExtrasValue', { n: summary.extras.length })
+          : t('booking.sumExtrasNone')}
+      </dd>
+    </div>
+    <div class="row" data-sum-row="subtotal" hidden={summary.subtotalCents === summary.totalCents}>
+      <dt>{t('booking.subtotal')}</dt>
+      <dd data-sum="subtotal">{money(summary.subtotalCents)}</dd>
+    </div>
+  </dl>
+  <div class="total" aria-live="polite">
+    <span>{t('booking.total')}</span>
+    <strong data-sum="total">{money(summary.totalCents)}</strong>
+  </div>
+  <div class="deposit">
+    <div class="line">
+      <span>{t('booking.deposit', { percent: summary.depositPercent })}</span>
+      <strong data-sum="deposit">{money(summary.depositCents)}</strong>
+    </div>
+    <div class="bar" aria-hidden="true"><div style={`width:${summary.depositPercent}%`}></div></div>
+    <div class="line small">
+      <span>{t('booking.rest')}</span>
+      <span data-sum="rest">{money(summary.restCents)}</span>
+    </div>
+  </div>
+  <button type="submit" form="reserva" class="btn btn-dark submit">{t('booking.submit')}</button>
+  <p class="note">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+      <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+    </svg>
+    {t('booking.secure')}
+  </p>
+  <p class="note">{t('booking.help')}</p>
+</aside>
+
+<style>
+  .summary {
+    /* design: ~430px (the button text set that width) */
+    flex: 1 1 430px;
+    min-width: 0;
+    position: sticky;
+    top: 24px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  h2 {
+    font-size: 34px;
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line-header);
+    font-size: 18px;
+  }
+
+  dt {
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+  }
+
+  .total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .total span {
+    font-size: 19px;
+    font-weight: 600;
+  }
+
+  .total strong {
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .deposit {
+    background: var(--row-hover);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 18px;
+  }
+
+  .line strong {
+    color: var(--ink);
+  }
+
+  .line.small {
+    font-size: 16px;
+    color: var(--text-2);
+  }
+
+  .bar {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--cal-legend-bg);
+    overflow: hidden;
+  }
+
+  .bar div {
+    height: 100%;
+    background: var(--ink);
+  }
+
+  .submit {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .note {
+    font-size: 16px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .note svg {
+    flex: none;
+    margin-top: 2px;
+    color: var(--ink);
+  }
+
+  /* Single column: the summary goes after the form and is no longer sticky */
+  @media (max-width: 1080px) {
+    .summary {
+      position: static;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .summary {
+      padding: 26px 20px;
+    }
+
+    .total strong {
+      font-size: 30px;
+    }
+  }
+</style>

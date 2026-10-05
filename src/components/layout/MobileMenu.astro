@@ -1,0 +1,196 @@
+---
+// PROVISIONAL: the design has no specific mobile menu. The panel follows the
+// style of the header (paper background, same links and buttons) until a design exists.
+import { icon } from '@fortawesome/fontawesome-svg-core';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import Button from '../ui/Button.astro';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+export type NavItem = { href: string; label: string; current: boolean };
+
+interface Props {
+  items: NavItem[];
+  bookHref: string;
+  loginHref: string;
+}
+
+const { items, bookHref, loginHref } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidden': 'true' } }).html.join('');
+---
+
+<button
+  class="menu-btn"
+  type="button"
+  aria-expanded="false"
+  aria-controls="mobile-menu"
+  aria-label={t('nav.menuOpen')}
+  data-menu-btn
+  data-label-open={t('nav.menuOpen')}
+  data-label-close={t('nav.menuClose')}
+>
+  <svg
+    class="icon-open"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg
+  >
+  <Fragment set:html={close} />
+</button>
+
+<div id="mobile-menu" class="panel paperbg" hidden data-menu-panel>
+  <nav aria-label={t('nav.mobileLabel')} class="container">
+    <ul>
+      {
+        items.map((item) => (
+          <li>
+            <a href={item.href} aria-current={item.current ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="actions">
+      <Button href={bookHref}>{t('nav.book')}</Button>
+      <Button href={loginHref}>{t('nav.login')}</Button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .menu-btn {
+    display: none;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: none;
+  }
+
+  .menu-btn:hover {
+    background: rgba(20, 20, 20, 0.08);
+  }
+
+  .menu-btn :global(.icon-close) {
+    display: none;
+    font-size: 24px;
+  }
+
+  .menu-btn[aria-expanded='true'] .icon-open {
+    display: none;
+  }
+
+  .menu-btn[aria-expanded='true'] :global(.icon-close) {
+    display: block;
+  }
+
+  .panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--line-header);
+    box-shadow: 0 18px 30px rgba(20, 20, 20, 0.08);
+    padding: 12px 0 32px;
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li + li {
+    border-top: 1px solid var(--line-header);
+  }
+
+  ul a {
+    display: flex;
+    align-items: center;
+    min-height: 60px;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  ul a:hover,
+  ul a[aria-current] {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 1180px) {
+    .menu-btn {
+      display: inline-flex;
+    }
+  }
+
+  @media (min-width: 1181px) {
+    .panel {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  function setOpen(btn: HTMLButtonElement, panel: HTMLElement, open: boolean, returnFocus = false) {
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', (open ? btn.dataset.labelClose : btn.dataset.labelOpen) ?? '');
+    panel.hidden = !open;
+    if (!open && returnFocus) btn.focus();
+  }
+
+  function getParts() {
+    const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
+    const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
+    return btn && panel ? { btn, panel } : null;
+  }
+
+  // Document-level listeners: registered once, survive navigations.
+  document.addEventListener('keydown', (e) => {
+    const parts = getParts();
+    if (e.key === 'Escape' && parts && !parts.panel.hidden) {
+      setOpen(parts.btn, parts.panel, false, true);
+    }
+  });
+
+  window.matchMedia('(min-width: 1181px)').addEventListener('change', (mq) => {
+    const parts = getParts();
+    if (mq.matches && parts) setOpen(parts.btn, parts.panel, false);
+  });
+
+  // Per-page listeners: the DOM changes with each navigation.
+  document.addEventListener('astro:page-load', () => {
+    const parts = getParts();
+    if (!parts) return;
+    const { btn, panel } = parts;
+    btn.addEventListener('click', () => setOpen(btn, panel, panel.hidden));
+    panel.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(btn, panel, false);
+    });
+  });
+</script>

@@ -1,0 +1,154 @@
+---
+import Button from '../ui/Button.astro';
+import LangSwitcher from './LangSwitcher.astro';
+import MobileMenu, { type NavItem } from './MobileMenu.astro';
+import { getLangFromUrl, localizePath, switchLangPath, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  /** On top of the hero (Inicio): absolute position, same appearance. */
+  overlay?: boolean;
+}
+
+const { overlay = false } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const home = localizePath('/', lang);
+// Pathname without language prefix, to mark the active section
+const path = switchLangPath(Astro.url.pathname, 'es');
+const isIn = (base: string) => path === base || path.startsWith(`${base}/`);
+
+const items: NavItem[] = [
+  { href: `${home}#servicios`, label: t('nav.services'), current: isIn('/servicios') },
+  { href: `${home}#sobre-nosotros`, label: t('nav.about'), current: false },
+  { href: localizePath('/extras', lang), label: t('nav.extras'), current: isIn('/extras') },
+  { href: localizePath('/blog', lang), label: t('nav.blog'), current: isIn('/blog') },
+  { href: `${home}#contacto`, label: t('nav.contact'), current: false },
+];
+const bookHref = localizePath('/reserva', lang);
+const loginHref = localizePath('/acceso', lang);
+---
+
+<header class:list={['site-header paperbg', { overlay }]}>
+  <div class="container bar">
+    <a href={home} class="logo serif" aria-label={t('nav.home')}>{t('site.name')}</a>
+
+    <nav class="nav-desktop" aria-label={t('nav.label')}>
+      {
+        items.map((item) => (
+          <a class="navlink" href={item.href} aria-current={item.current ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="tools">
+      <LangSwitcher />
+      <Button href={bookHref} size="sm" class="nav-desktop">{t('nav.book')}</Button>
+      <Button href={loginHref} size="sm" class="nav-desktop">{t('nav.login')}</Button>
+      <MobileMenu items={items} bookHref={bookHref} loginHref={loginHref} />
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: relative;
+    z-index: 20;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--line-header);
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: var(--header-h);
+    flex-wrap: nowrap;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 34px;
+    text-decoration: none;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .navlink {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 10px 4px;
+    white-space: nowrap;
+  }
+
+  .navlink:hover,
+  .navlink[aria-current] {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+  }
+
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: none;
+  }
+
+  @media (max-width: 1180px) {
+    .nav-desktop,
+    .tools :global(.nav-desktop) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .bar {
+      gap: 8px;
+    }
+
+    .logo {
+      font-size: 30px;
+    }
+
+    .tools {
+      gap: 4px;
+    }
+  }
+
+  /* Very narrow screens (320–360px): the logo, language and menu must fit on one line
+     without being cut off (at 320px they needed 341px). */
+  @media (max-width: 360px) {
+    .bar {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .logo {
+      font-size: 26px;
+    }
+
+    .tools {
+      gap: 0;
+    }
+  }
+</style>

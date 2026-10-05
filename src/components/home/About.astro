@@ -1,0 +1,117 @@
+---
+import { Image } from 'astro:assets';
+import cocineros from '../../assets/images/cocineros.jpg';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const facts = [1, 2, 3] as const;
+---
+
+<!-- DEMO: «Nosotros» texts are example text (visible notice from the design). -->
+<section id="sobre-nosotros" class="paperbg section" aria-labelledby="nosotros-title">
+  <Image
+    src={cocineros}
+    alt={t('home.about.alt')}
+    widths={[800, 1280, 1920, 2560]}
+    sizes="100vw"
+    loading="lazy"
+    class="photo"
+  />
+  <div class="container inner">
+    <p class="eyebrow">{t('home.about.eyebrow')}</p>
+    <h2 id="nosotros-title">{t('home.about.title')}</h2>
+    <div class="cols">
+      <p class="lead">{t('home.about.p1')}</p>
+      <p class="lead">{t('home.about.p2')}</p>
+      <p class="lead">{t('home.about.p3')}</p>
+      <p class="lead">{t('home.about.p4')}</p>
+    </div>
+    <ul class="facts">
+      {
+        facts.map((n) => (
+          <li>
+            <strong>{t(`home.about.f${n}Title`)}</strong>
+            <span>{t(`home.about.f${n}Text`)}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="demo">{t('home.about.demo')}</p>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 0 0 130px;
+    background: var(--surface);
+  }
+
+  .photo {
+    width: 100%;
+    height: clamp(320px, 52vw, 720px);
+    object-fit: cover;
+    object-position: center 35%;
+  }
+
+  .inner {
+    max-width: 1000px;
+    padding-top: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  h2 {
+    font-size: clamp(42px, 5vw, 68px);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+    gap: 24px 56px;
+  }
+
+  .cols .lead {
+    font-size: 20px;
+  }
+
+  .facts {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: 20px;
+  }
+
+  .facts li {
+    border-top: 2px solid var(--ink);
+    padding-top: 14px;
+  }
+
+  .facts strong {
+    display: block;
+    font-size: 19px;
+    color: var(--ink);
+  }
+
+  .facts span {
+    color: var(--muted);
+    font-size: 17px;
+  }
+
+  .demo {
+    font-size: 15px;
+    color: var(--text-4);
+  }
+
+  @media (max-width: 700px) {
+    .section {
+      padding-bottom: 88px;
+    }
+
+    .inner {
+      padding-top: 64px;
+    }
+  }
+</style>

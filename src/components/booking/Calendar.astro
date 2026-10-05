@@ -1,0 +1,316 @@
+---
+// Two-month calendar (demo data in src/data/availability.ts). Shows one month at a time,
+// with previous/next buttons. Day states are never told apart by color alone:
+// «completo» = struck through + disabled, «pocas plazas» = dot, «tu fecha» = filled;
+// each day has its full aria-label.
+import { availability } from '../../data/availability';
+import { LOCALE } from '../../data/config';
+import { getAvailabilityStatus } from '../../lib/reservation/availability';
+import { toIsoDate } from '../../lib/dates';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  /** Initially selected date (YYYY-MM-DD). */
+  selected: string | null;
+}
+
+const { selected } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+// Base status from the shared logic. The rules that depend on «today» (past days,
+// lead time) are applied in the browser with the same function (getDayStatus).
+const months = availability.map((m) => {
+  const first = new Date(m.year, m.month, 1);
+  const length = new Date(m.year, m.month + 1, 0).getDate();
+  const monthName = first.toLocaleDateString(LOCALE, { month: 'long' });
+  return {
+    label: cap(first.toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' })).replace(
+      ' de ',
+      ' ',
+    ),
+    offset: (first.getDay() + 6) % 7,
+    days: Array.from({ length }, (_, i) => {
+      const d = i + 1;
+      const date = toIsoDate(m.year, m.month, d);
+      return { d, date, status: getAvailabilityStatus(date, availability) ?? 'available', monthName };
+    }),
+  };
+});
+const selectedMonth = Math.max(
+  0,
+  months.findIndex((m) => m.days.some((d) => d.date === selected)),
+);
+const statusText = {
+  available: t('booking.dayAvailable'),
+  few: t('booking.dayFew'),
+  full: t('booking.dayFull'),
+};
+// Texts for all statuses (the browser recalculates past / out-of-range).
+const statusLabels = JSON.stringify({
+  ...statusText,
+  past: t('booking.dayPast'),
+  'out-of-range': t('booking.dayOutOfRange'),
+  'no-data': t('booking.dayOutOfRange'),
+});
+---
+
+<div
+  class="calendar"
+  data-calendar
+  data-label-selected={t('booking.daySelected')}
+  data-status-labels={statusLabels}
+>
+  <div class="cal-head">
+    <button type="button" class="nav" aria-label={t('booking.prevMonth')} data-cal-prev>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg
+      >
+    </button>
+    <p class="cal-title" aria-live="polite" data-cal-label>{months[selectedMonth]?.label}</p>
+    <button type="button" class="nav" aria-label={t('booking.nextMonth')} data-cal-next>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg
+      >
+    </button>
+  </div>
+
+  {
+    months.map((month, mi) => (
+      <div class="grid" data-cal-month={mi} data-label={month.label} hidden={mi !== selectedMonth}>
+        {weekdays.map((w) => (
+          <span class="wd" aria-hidden="true">
+            {w}
+          </span>
+        ))}
+        {Array.from({ length: month.offset }, () => (
+          <span aria-hidden="true" />
+        ))}
+        {month.days.map((day) => {
+          const isSel = day.date === selected;
+          const base = `${day.d} de ${day.monthName}, ${statusText[day.status as keyof typeof statusText]}`;
+          return (
+            <button
+              type="button"
+              class:list={['day', day.status]}
+              disabled={day.status === 'full'}
+              aria-pressed={isSel ? 'true' : 'false'}
+              aria-label={isSel ? `${base}, ${t('booking.daySelected')}` : base}
+              data-date={day.date}
+              data-day={day.d}
+              data-month-name={day.monthName}
+              data-base-label={base}
+            >
+              <span>{day.d}</span>
+              <span class="dot" aria-hidden="true" />
+            </button>
+          );
+        })}
+      </div>
+    ))
+  }
+
+  <ul class="legend-list">
+    <li><span class="sw sw-available" aria-hidden="true"></span>{t('booking.legendAvailable')}</li>
+    <li>
+      <span class="sw sw-available sw-few" aria-hidden="true"><span></span></span>{
+        t('booking.legendFew')
+      }
+    </li>
+    <li><span class="sw sw-full" aria-hidden="true"></span>{t('booking.legendFull')}</li>
+    <li><span class="sw sw-sel" aria-hidden="true"></span>{t('booking.legendSelected')}</li>
+  </ul>
+</div>
+
+<style>
+  .calendar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .cal-title {
+    font-family: var(--font-sans);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .nav {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1.5px solid var(--field-border-a11y);
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+
+  .nav:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .wd {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .day {
+    min-height: 68px;
+    border-radius: 8px;
+    font: 600 20px var(--font-sans);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    border: 1.5px solid var(--field-border-a11y);
+    background: var(--white);
+    color: var(--ink);
+    padding: 0;
+  }
+
+  .day:hover:not(:disabled) {
+    border-color: var(--ink);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .day.few .dot {
+    background: var(--few-dot);
+  }
+
+  .day.full,
+  .day.out {
+    border-color: transparent;
+    background: var(--cal-full-bg);
+    color: var(--text-5);
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  .day[aria-pressed='true'] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .day[aria-pressed='true'] .dot {
+    background: var(--white);
+  }
+
+  .day.available[aria-pressed='true'] .dot {
+    background: transparent;
+  }
+
+  .legend-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    font-size: 16px;
+    color: var(--text-2);
+  }
+
+  .legend-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sw {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    flex: none;
+  }
+
+  .sw-available {
+    border: 1.5px solid var(--field-border-a11y);
+    background: var(--white);
+  }
+
+  .sw-few {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .sw-few span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--few-dot);
+    margin-bottom: 3px;
+  }
+
+  .sw-full {
+    background: var(--cal-full-bg);
+  }
+
+  .sw-sel {
+    background: var(--ink);
+  }
+
+  @media (max-width: 560px) {
+    .grid {
+      gap: 4px;
+    }
+
+    .day {
+      min-height: 48px;
+      font-size: 17px;
+      border-radius: 6px;
+    }
+
+    .wd {
+      font-size: 15px;
+    }
+
+    .cal-title {
+      font-size: 22px;
+    }
+  }
+</style>

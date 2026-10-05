@@ -1,0 +1,496 @@
+---
+// /acceso: manager access. DEMO — THERE IS NO REAL AUTHENTICATION (see src/lib/access/demo-access.ts).
+// «Entrar» validates the format and takes you to the example panel; «Crear cuenta» and «Google»
+// create nothing and connect to no service. No site header or footer (own design).
+// PENDING DECISION: the design texts address the client («tu evento, tus invitados y tus
+// pagos», «Para clientes y gestores»), while the instruction defines /acceso as manager access.
+import { Image } from 'astro:assets';
+import { fade } from 'astro:transitions';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LangSwitcher from '../components/layout/LangSwitcher.astro';
+import servilletaLazo from '../assets/images/servilleta-lazo.webp';
+import { DEMO_PANEL_PATH } from '../lib/access/demo-access';
+import es from '../i18n/es.json';
+import { getLangFromUrl, localizePath, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const home = localizePath('/', lang);
+const errorTexts = Object.fromEntries(
+  Object.keys(es)
+    .filter((key) => key.startsWith('access.err.'))
+    .map((key) => [key.replace('access.err.', ''), t(key as keyof typeof es)]),
+);
+const tabTexts = {
+  login: { title: t('access.loginTitle'), subtitle: t('access.loginSubtitle'), google: t('access.googleLogin') },
+  register: { title: t('access.regTitle'), subtitle: t('access.regSubtitle'), google: t('access.googleRegister') },
+};
+---
+
+<BaseLayout title={t('access.title')} header="none" footer="none" wrapMain={false}>
+  <div class="access" data-access data-errors-text={JSON.stringify(errorTexts)} data-tabs={JSON.stringify(tabTexts)} data-panel-path={localizePath(DEMO_PANEL_PATH, lang)} data-demo-google={t('access.demoGoogle')} data-demo-register={t('access.demoRegister')}>
+    <div class="side">
+      <Image src={servilletaLazo} alt="" widths={[600, 900, 1200]} sizes="(max-width: 1040px) 100vw, 50vw" loading="eager" class="side-img" />
+      <a href={home} class="logo serif" aria-label={t('nav.home')}>{t('site.name')}</a>
+      <div class="side-copy">
+        <p class="serif side-title">{t('access.sideTitle')}</p>
+        <p class="side-text">{t('access.sideText')}</p>
+      </div>
+    </div>
+
+    <main id="main-content" class="paperbg content" transition:animate={fade({ duration: '300ms' })}>
+      <div class="box">
+        <div class="top">
+          <a href={home} class="back">{t('access.back')}</a>
+          <LangSwitcher />
+        </div>
+
+        <div class="heading">
+          <h1 data-title>{tabTexts.login.title}</h1>
+          <p data-subtitle>{tabTexts.login.subtitle}</p>
+        </div>
+
+        <div role="tablist" aria-label={t('access.label')} class="tabs">
+          <button type="button" role="tab" id="tab-login" class="tab" aria-selected="true" aria-controls="panel-login" data-tab="login">
+            {t('access.tabLogin')}
+          </button>
+          <button type="button" role="tab" id="tab-register" class="tab" aria-selected="false" aria-controls="panel-register" tabindex="-1" data-tab="register">
+            {t('access.tabRegister')}
+          </button>
+        </div>
+
+        <button type="button" class="abtn google" data-google>
+          <svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"
+            ><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"
+            ></path><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.7 6c4.5-4.2 6.9-10.3 6.9-17.7z"
+            ></path><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.8-6.1z"
+            ></path><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.1C6.6 42.6 14.6 48 24 48z"
+            ></path></svg
+          >
+          <span data-google-label>{tabTexts.login.google}</span>
+        </button>
+        <p class="demo-note" role="status" data-google-status></p>
+
+        <div class="divider"><span></span>{t('access.or')}<span></span></div>
+
+        <!-- Login (DEMO: no authentication) -->
+        <form id="panel-login" role="tabpanel" aria-labelledby="tab-login" class="aform" novalidate data-form="login">
+          <div class="field">
+            <label for="l-email">{t('access.email')}</label>
+            <input id="l-email" required name="email" class="input" type="email" autocomplete="email" aria-describedby="l-email-error" data-field="email" />
+            <p class="field-error" id="l-email-error" data-error="email"></p>
+          </div>
+          <div class="field">
+            <div class="label-row">
+              <label for="l-pass">{t('access.password')}</label>
+              <a class="forgot is-pending">{t('access.forgot')}<span class="sr-only"> {t('a11y.pending')}</span></a>
+            </div>
+            <input id="l-pass" required name="password" class="input" type="password" autocomplete="current-password" aria-describedby="l-pass-error" data-field="password" />
+            <p class="field-error" id="l-pass-error" data-error="password"></p>
+          </div>
+          <label class="check"><input type="checkbox" checked />{t('access.keep')}</label>
+          <button type="submit" class="abtn primary">{t('access.submitLogin')}</button>
+        </form>
+
+        <!-- Registration (DEMO: no account is created) -->
+        <form id="panel-register" role="tabpanel" aria-labelledby="tab-register" class="aform" novalidate hidden data-form="register">
+          <div class="field">
+            <label for="r-name">{t('access.name')}</label>
+            <input id="r-name" required name="nombre" class="input" autocomplete="name" aria-describedby="r-name-error" data-field="name" />
+            <p class="field-error" id="r-name-error" data-error="name"></p>
+          </div>
+          <div class="field">
+            <label for="r-email">{t('access.email')}</label>
+            <input id="r-email" required name="email" class="input" type="email" autocomplete="email" aria-describedby="r-email-error" data-field="email" />
+            <p class="field-error" id="r-email-error" data-error="email"></p>
+          </div>
+          <div class="field">
+            <label for="r-pass">{t('access.password')}</label>
+            <input id="r-pass" required class="input" type="password" autocomplete="new-password" aria-describedby="r-pass-hint r-pass-error" data-field="password" />
+            <p class="hint" id="r-pass-hint">{t('access.passwordHint')}</p>
+            <p class="field-error" id="r-pass-error" data-error="password"></p>
+          </div>
+          <div class="field">
+            <label for="r-org">{t('access.org')}</label>
+            <input id="r-org" name="empresa" class="input" autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label class="check">
+              <input type="checkbox" id="r-privacy" required aria-describedby="r-privacy-error" data-field="privacy" />
+              <span>
+                {t('access.acceptBefore')}{' '}
+                <a class="is-pending">{t('common.privacyPolicy')}<span class="sr-only"> {t('a11y.pending')}</span></a>.
+              </span>
+            </label>
+            <p class="field-error" id="r-privacy-error" data-error="privacy"></p>
+          </div>
+          <button type="submit" class="abtn primary">{t('access.submitRegister')}</button>
+          <p class="demo-note" role="status" data-register-status></p>
+        </form>
+
+        <p class="help">{t('access.help')}</p>
+        <a href={localizePath(DEMO_PANEL_PATH, lang)} class="demo-link">{t('access.demoPanel')}</a>
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .access {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100svh;
+  }
+
+  /* ── Image half ── */
+  .side {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    flex: 1 1 480px;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px;
+  }
+
+  .side :global(.side-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+
+  .side::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(246, 242, 233, 0) 40%, rgba(20, 20, 20, 0.7) 100%);
+    z-index: -1;
+  }
+
+  .logo {
+    font-size: 30px;
+    text-decoration: none;
+    color: var(--ink);
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .side-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 460px;
+  }
+
+  .side-title {
+    color: var(--white);
+    font-size: 44px;
+  }
+
+  .side-text {
+    color: var(--foot-light);
+    font-size: 19px;
+  }
+
+  /* ── Form half ── */
+  .content {
+    flex: 1 1 560px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 24px;
+    line-height: 1.6;
+  }
+
+  .box {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .back {
+    font-size: 17px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .heading {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  h1 {
+    font-size: 52px;
+  }
+
+  .heading p {
+    color: var(--text-2);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--line-panel);
+    padding: 6px;
+    border-radius: 999px;
+  }
+
+  .tab {
+    flex: 1;
+    min-height: 56px;
+    border: 0;
+    background: var(--line-panel);
+    font: 600 18px var(--font-sans);
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 999px;
+  }
+
+  .tab[aria-selected='true'] {
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: 0 2px 8px rgba(20, 20, 20, 0.1);
+  }
+
+  .abtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 60px;
+    padding: 0 28px;
+    border-radius: 999px;
+    font: 600 18px var(--font-sans);
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .primary {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .primary:hover {
+    background: var(--ink-hover);
+  }
+
+  .google {
+    background: var(--white);
+    border-color: var(--field-border-a11y);
+    color: var(--ink);
+  }
+
+  .google:hover {
+    background: var(--google-hover);
+  }
+
+  .demo-note {
+    font-size: 16px;
+    color: var(--muted);
+    margin: -16px 0 0;
+  }
+
+  .demo-note:empty {
+    display: none;
+  }
+
+  .aform .demo-note {
+    margin: 0;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  .divider span {
+    flex: 1;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .aform {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .forgot {
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .check {
+    align-items: flex-start;
+    font-size: 17px;
+    min-height: 44px;
+  }
+
+  .check input {
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+  }
+
+  .check a {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .help {
+    font-size: 17px;
+    color: var(--text-2);
+    text-align: center;
+  }
+
+  .demo-link {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  @media (max-width: 700px) {
+    .side {
+      padding: 28px 20px;
+      min-height: 360px;
+    }
+
+    .side-title {
+      font-size: 36px;
+    }
+
+    .content {
+      padding: 40px 20px 56px;
+    }
+
+    h1 {
+      font-size: 44px;
+    }
+  }
+</style>
+
+<script>
+  // DEMO access. THERE IS NO AUTHENTICATION: no credentials are checked and nothing is stored.
+  import { navigate } from 'astro:transitions/client';
+  import { demoRegister, demoSignIn, type AccessError } from '../lib/access/demo-access';
+
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-access]');
+    if (!root) return;
+    const errorTexts: Record<string, string> = JSON.parse(root.dataset.errorsText ?? '{}');
+    const tabTexts: Record<'login' | 'register', { title: string; subtitle: string; google: string }> = JSON.parse(root.dataset.tabs ?? '{}');
+    const panelPath = root.dataset.panelPath ?? '/panel/invitados';
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const googleStatus = root.querySelector<HTMLElement>('[data-google-status]');
+
+    // ── Tabs (keyboard: arrows, Home/End) ──
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      const which = tab.dataset.tab as 'login' | 'register';
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !on;
+      });
+      const texts = tabTexts[which];
+      root.querySelector('[data-title]')!.textContent = texts.title;
+      root.querySelector('[data-subtitle]')!.textContent = texts.subtitle;
+      root.querySelector('[data-google-label]')!.textContent = texts.google;
+      if (googleStatus) googleStatus.textContent = '';
+      if (focus) tab.focus();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(tab));
+      tab.addEventListener('keydown', (e) => {
+        const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (next === undefined) return;
+        e.preventDefault();
+        select(tabs[(next + tabs.length) % tabs.length], true);
+      });
+    });
+
+    // ── Google: DEMO, no OAuth ──
+    root.querySelector('[data-google]')?.addEventListener('click', () => {
+      if (googleStatus) googleStatus.textContent = root.dataset.demoGoogle ?? '';
+    });
+
+    // ── Errors ──
+    const showErrors = (form: HTMLFormElement, errors: AccessError[]) => {
+      form.querySelectorAll<HTMLElement>('[data-error]').forEach((el) => {
+        const err = errors.find((e) => e.field === el.dataset.error);
+        el.textContent = err ? (errorTexts[`${err.field}.${err.code}`] ?? '') : '';
+      });
+      form.querySelectorAll<HTMLInputElement>('[data-field]').forEach((input) => {
+        if (errors.some((e) => e.field === input.dataset.field)) input.setAttribute('aria-invalid', 'true');
+        else input.removeAttribute('aria-invalid');
+      });
+      const first = errors[0] && form.querySelector<HTMLInputElement>(`[data-field="${errors[0].field}"]`);
+      first?.focus();
+    };
+    const value = (form: HTMLFormElement, field: string) =>
+      form.querySelector<HTMLInputElement>(`[data-field="${field}"]`)?.value ?? '';
+
+    // ── Entrar: DEMO, validates the format and goes to the example panel ──
+    const login = root.querySelector<HTMLFormElement>('[data-form="login"]');
+    login?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const result = demoSignIn({ email: value(login, 'email'), password: value(login, 'password') }, () => panelPath);
+      if (!result.ok) return showErrors(login, result.errors);
+      showErrors(login, []);
+      login.reset(); // the password is not kept
+      navigate(result.redirectTo);
+    });
+
+    // ── Crear cuenta: DEMO, validates only; no account is created ──
+    const register = root.querySelector<HTMLFormElement>('[data-form="register"]');
+    const registerStatus = root.querySelector<HTMLElement>('[data-register-status]');
+    register?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const result = demoRegister({
+        name: value(register, 'name'),
+        email: value(register, 'email'),
+        password: value(register, 'password'),
+        acceptsPrivacy: register.querySelector<HTMLInputElement>('[data-field="privacy"]')?.checked ?? false,
+      });
+      showErrors(register, result.errors);
+      if (registerStatus) registerStatus.textContent = result.ok ? (root.dataset.demoRegister ?? '') : '';
+      if (result.ok) register.reset();
+    });
+  });
+</script>
