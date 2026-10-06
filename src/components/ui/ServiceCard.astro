@@ -72,9 +72,8 @@ const t = useTranslations(getLangFromUrl(Astro.url));
 </li>
 
 <style>
+  /* Width and position: set by the Slider (grid or carousel) */
   .scard {
-    flex: 0 0 calc((100% - 56px) / 3);
-    scroll-snap-align: start;
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -105,8 +104,8 @@ const t = useTranslations(getLangFromUrl(Astro.url));
   .scard-body {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 26px 28px 28px;
+    gap: 10px;
+    padding: 26px 28px 24px;
     flex: 1;
   }
 
@@ -114,10 +113,10 @@ const t = useTranslations(getLangFromUrl(Astro.url));
     font-size: 32px;
   }
 
+  /* «Descubrir» goes right after the text (no stretching gap) */
   p {
     color: var(--text-2);
     font-size: 18px;
-    flex: 1;
   }
 
   .scard-link {
@@ -128,7 +127,6 @@ const t = useTranslations(getLangFromUrl(Astro.url));
     font-weight: 700;
     color: var(--ink);
     text-decoration: none;
-    margin-top: 6px;
     min-height: 44px;
     align-self: flex-start;
   }
@@ -146,15 +144,4 @@ const t = useTranslations(getLangFromUrl(Astro.url));
     transform: translateX(5px);
   }
 
-  @media (max-width: 1100px) {
-    .scard {
-      flex-basis: calc((100% - 28px) / 2);
-    }
-  }
-
-  @media (max-width: 700px) {
-    .scard {
-      flex-basis: 84%;
-    }
-  }
 </style>

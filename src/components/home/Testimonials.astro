@@ -1,9 +1,10 @@
 ---
 // Carousel of a single quote. DEMO: example testimonials (visible notice from the design).
-import { testimonials } from '../../data/testimonials';
+import { getTestimonials } from '../../data/testimonials';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
 
 const t = useTranslations(getLangFromUrl(Astro.url));
+const testimonials = getTestimonials(t);
 const total = testimonials.length;
 ---
 

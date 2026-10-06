@@ -89,15 +89,17 @@
   /* ── Typography ── */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-logo: 'Rubik Dirt', var(--font-serif);
 
   /* ── Layout ── */
   --container: 1240px;
   --gutter: 40px;
-  --header-h: 104px;
+  --header-h: 78px;
 }
 
 @media (max-width: 900px) {
   :root {
     --gutter: 20px;
+    --header-h: 58px;
   }
 }

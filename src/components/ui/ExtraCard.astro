@@ -28,7 +28,7 @@ const placeholder = ['ph-dark', 'ph-straw', 'ph-grey'][index % 3];
           src={extra.image}
           alt={extra.alt ?? ''}
           widths={[300, 450, 600]}
-          sizes="(max-width: 700px) 84vw, (max-width: 1100px) 50vw, 300px"
+          sizes="(max-width: 700px) 84vw, (max-width: 1023px) 50vw, 280px"
           loading="lazy"
         />
       </div>
@@ -53,7 +53,7 @@ const placeholder = ['ph-dark', 'ph-straw', 'ph-grey'][index % 3];
       </div>
     )
   }
-  <span class="cat">{extra.cat}</span>
+  <span class="cat">{extra.catLabel}</span>
   <Heading class="serif title">{extra.title}</Heading>
   <p class="text">{extra.text}</p>
   <slot />
@@ -65,11 +65,6 @@ const placeholder = ['ph-dark', 'ph-straw', 'ph-grey'][index % 3];
     flex-direction: column;
     gap: 18px;
     min-width: 0;
-  }
-
-  .slide {
-    flex: 0 0 calc((100% - 84px) / 4);
-    scroll-snap-align: start;
   }
 
   .grid {
@@ -153,15 +148,4 @@ const placeholder = ['ph-dark', 'ph-straw', 'ph-grey'][index % 3];
     flex: 1;
   }
 
-  @media (max-width: 1100px) {
-    .slide {
-      flex-basis: calc((100% - 28px) / 2);
-    }
-  }
-
-  @media (max-width: 700px) {
-    .slide {
-      flex-basis: 84%;
-    }
-  }
 </style>

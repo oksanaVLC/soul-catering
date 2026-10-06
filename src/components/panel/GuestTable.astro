@@ -64,11 +64,11 @@ const showingTpl = t('panel.showing');
               <td>
                 <StatusBadge status={g.attendance} />
               </td>
-              <td>{g.menu ?? t('panel.none')}</td>
+              <td>{g.menu ? t(`guestMenu.${g.menu}`) : t('panel.none')}</td>
               <td>
                 <div class="als">
                   {g.allergens.length ? (
-                    g.allergens.map((a) => <span class="al">{a}</span>)
+                    g.allergens.map((a) => <span class="al">{t(`guestAllergen.${a}`)}</span>)
                   ) : (
                     <span class="none">{t('panel.none')}</span>
                   )}

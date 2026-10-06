@@ -10,9 +10,9 @@ export interface Guest {
   email: string | null;
   table: string;
   attendance: Attendance;
-  /** Assigned menu (text from the design); null if not attending. */
+  /** Assigned menu id (label: guestMenu.<id> in i18n); null if not attending. */
   menu: string | null;
-  /** Allergy/preference labels as they appear in the panel design (nomenclature: PENDING DECISION). */
+  /** Allergy ids (label: guestAllergen.<id> in i18n, as in the panel design; nomenclature: PENDING DECISION). */
   allergens: string[];
 }
 
@@ -29,11 +29,13 @@ export interface GuestCounts {
 
 /** Event the guest list belongs to (header of the panel). */
 export interface PanelEvent {
-  /** Name shown in the breadcrumb («Boda [NOMBRES]»). */
+  /** i18n key of the name shown in the breadcrumb («Boda [NOMBRES]»). */
   name: string;
   date: string;
   time: string;
+  /** i18n key of the venue. */
   venue: string;
+  /** Menu id (menu.<id>.name in i18n). */
   menu: string;
   totalCents: number;
 }

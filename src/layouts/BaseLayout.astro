@@ -4,14 +4,14 @@ import '@fontsource/plus-jakarta-sans/400.css';
 import '@fontsource/plus-jakarta-sans/500.css';
 import '@fontsource/plus-jakarta-sans/600.css';
 import '@fontsource/plus-jakarta-sans/700.css';
+import '@fontsource/rubik-dirt/400.css';
 import '../styles/global.css';
 
 import { getImage } from 'astro:assets';
 import { ClientRouter, fade } from 'astro:transitions';
-import Header from '../components/layout/Header.astro';
-import Footer from '../components/layout/Footer.astro';
-import paperTexture from '../assets/images/texture-paper.jpg';
 import silverTexture from '../assets/images/texture-silver.jpg';
+import Footer from '../components/layout/Footer.astro';
+import Header from '../components/layout/Header.astro';
 import { getLangFromUrl, publishedLanguages, switchLangPath, useTranslations } from '../i18n/utils';
 
 interface Props {
@@ -47,12 +47,11 @@ const alternates = publishedLanguages.map((code) => ({
   href: new URL(switchLangPath(Astro.url.pathname, code), Astro.site).href,
 }));
 
-// Textures: optimized versions, applied as background in ::before (global.css)
-const paper = await getImage({ src: paperTexture, width: 1600, format: 'webp', quality: 70 });
+// Gray texture: optimized version, applied as background in ::before (global.css)
 const silver = await getImage({ src: silverTexture, width: 1600, format: 'webp', quality: 70 });
 // og:locale in language_TERRITORY format. PENDING DECISION: territory for English.
 const ogLocale = { es: 'es_ES', en: 'en', fr: 'fr_FR', ru: 'ru_RU' }[lang];
-const textureVars = `--tex-paper: url("${paper.src}"); --tex-silver: url("${silver.src}");`;
+const textureVars = `--tex-silver: url("${silver.src}");`;
 ---
 
 <!doctype html>
@@ -63,7 +62,9 @@ const textureVars = `--tex-paper: url("${paper.src}"); --tex-silver: url("${silv
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
-    {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
+    {alternates.map((alt) => (
+      <link rel="alternate" hreflang={alt.code} href={alt.href} />
+    ))}
     <link
       rel="alternate"
       hreflang="x-default"
@@ -82,17 +83,17 @@ const textureVars = `--tex-paper: url("${paper.src}"); --tex-silver: url("${silv
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link" href="#main-content">{t('a11y.skip')}</a>
+    <a class="skip-link" href="#main-content">
+      {t('a11y.skip')}
+    </a>
     {header !== 'none' && <Header overlay={header === 'overlay'} />}
-    {
-      wrapMain ? (
-        <main id="main-content" transition:animate={fade({ duration: '300ms' })}>
-          <slot />
-        </main>
-      ) : (
+    {wrapMain ? (
+      <main id="main-content" transition:animate={fade({ duration: '300ms' })}>
         <slot />
-      )
-    }
+      </main>
+    ) : (
+      <slot />
+    )}
     {footer !== 'none' && <Footer variant={footer} />}
   </body>
 </html>

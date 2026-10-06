@@ -43,7 +43,7 @@ const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidde
   <Fragment set:html={close} />
 </button>
 
-<div id="mobile-menu" class="panel paperbg" hidden data-menu-panel>
+<div id="mobile-menu" class="panel bg-base" hidden data-menu-panel>
   <nav aria-label={t('nav.mobileLabel')} class="container">
     <ul>
       {
@@ -100,7 +100,6 @@ const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidde
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--bg-header);
     border-bottom: 1px solid var(--line-header);
     box-shadow: 0 18px 30px rgba(20, 20, 20, 0.08);
     padding: 12px 0 32px;

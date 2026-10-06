@@ -5,7 +5,7 @@
 import type { ReservationSummary } from '../../types/reservation';
 import { formatCents } from '../../lib/money';
 import { formatLongDate } from '../../lib/dates';
-import { LOCALE } from '../../data/config';
+import { localeFor } from '../../data/config';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
 
 interface Props {
@@ -13,7 +13,9 @@ interface Props {
 }
 
 const { summary } = Astro.props;
-const t = useTranslations(getLangFromUrl(Astro.url));
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const LOCALE = localeFor(lang);
 const money = (cents: number) => formatCents(cents, { locale: LOCALE });
 const place = [summary.venue.city.trim(), t(summary.venue.space === 'interior' ? 'booking.indoor' : 'booking.outdoor')]
   .filter(Boolean)
@@ -24,7 +26,7 @@ const hasCity = summary.venue.city.trim() !== '';
 <aside class="summary" aria-labelledby="summary-title">
   <h2 id="summary-title">{t('booking.summaryTitle')}</h2>
   <dl>
-    <div class="row"><dt>{t('booking.sumMenu')}</dt><dd data-sum="menu">{summary.menu?.name ?? '—'}</dd></div>
+    <div class="row"><dt>{t('booking.sumMenu')}</dt><dd data-sum="menu">{summary.menu ? t(`menu.${summary.menu.id}.name`) : '—'}</dd></div>
     <div class="row">
       <dt>{t('booking.sumGuests')}</dt>
       <dd data-sum="guests">

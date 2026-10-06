@@ -5,11 +5,12 @@ import PageHero from '../components/ui/PageHero.astro';
 import ExtraCard from '../components/ui/ExtraCard.astro';
 import Button from '../components/ui/Button.astro';
 import servilletaLazo from '../assets/images/servilleta-lazo.webp';
-import { extras, extraCategories, extrasInitiallySelected } from '../data/extras';
+import { getExtras, extraCategories, extrasInitiallySelected } from '../data/extras';
 import { getLangFromUrl, localizePath, useTranslations } from '../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const extras = getExtras(t);
 const initialCount = extrasInitiallySelected.length;
 ---
 
@@ -32,7 +33,7 @@ const initialCount = extrasInitiallySelected.length;
               aria-pressed={i === 0 ? 'true' : 'false'}
               data-filter={cat}
             >
-              {cat}
+              {t(`extraCat.${cat}`)}
             </button>
           ))
         }
@@ -179,7 +180,7 @@ const initialCount = extrasInitiallySelected.length;
         const cat = chip.dataset.filter;
         chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
         cards.forEach((card) => {
-          card.hidden = !(cat === 'Todos' || card.dataset.cat === cat);
+          card.hidden = !(cat === 'all' || card.dataset.cat === cat);
         });
       }),
     );

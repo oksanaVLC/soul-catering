@@ -1,8 +1,8 @@
 ---
+import { getLangFromUrl, localizePath, switchLangPath, useTranslations } from '../../i18n/utils';
 import Button from '../ui/Button.astro';
 import LangSwitcher from './LangSwitcher.astro';
 import MobileMenu, { type NavItem } from './MobileMenu.astro';
-import { getLangFromUrl, localizePath, switchLangPath, useTranslations } from '../../i18n/utils';
 
 interface Props {
   /** On top of the hero (Inicio): absolute position, same appearance. */
@@ -28,24 +28,28 @@ const bookHref = localizePath('/reserva', lang);
 const loginHref = localizePath('/acceso', lang);
 ---
 
-<header class:list={['site-header paperbg', { overlay }]}>
+<header class:list={['site-header bg-base', { overlay }]}>
   <div class="container bar">
-    <a href={home} class="logo serif" aria-label={t('nav.home')}>{t('site.name')}</a>
+    <a href={home} class="logo logo-font" aria-label={t('nav.home')}>
+      {t('site.name')}
+    </a>
 
     <nav class="nav-desktop" aria-label={t('nav.label')}>
-      {
-        items.map((item) => (
-          <a class="navlink" href={item.href} aria-current={item.current ? 'page' : undefined}>
-            {item.label}
-          </a>
-        ))
-      }
+      {items.map((item) => (
+        <a class="navlink" href={item.href} aria-current={item.current ? 'page' : undefined}>
+          {item.label}
+        </a>
+      ))}
     </nav>
 
     <div class="tools">
       <LangSwitcher />
-      <Button href={bookHref} size="sm" class="nav-desktop">{t('nav.book')}</Button>
-      <Button href={loginHref} size="sm" class="nav-desktop">{t('nav.login')}</Button>
+      <Button href={bookHref} size="sm" class="nav-desktop">
+        {t('nav.book')}
+      </Button>
+      <Button href={loginHref} size="sm" class="nav-desktop">
+        {t('nav.login')}
+      </Button>
       <MobileMenu items={items} bookHref={bookHref} loginHref={loginHref} />
     </div>
   </div>
@@ -55,7 +59,6 @@ const loginHref = localizePath('/acceso', lang);
   .site-header {
     position: relative;
     z-index: 20;
-    background: var(--bg-header);
     border-bottom: 1px solid var(--line-header);
   }
 
@@ -79,7 +82,7 @@ const loginHref = localizePath('/acceso', lang);
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    font-size: 34px;
+    font-size: 30px;
     text-decoration: none;
     color: var(--ink);
     white-space: nowrap;
@@ -127,7 +130,7 @@ const loginHref = localizePath('/acceso', lang);
     }
 
     .logo {
-      font-size: 30px;
+      font-size: 25px;
     }
 
     .tools {
@@ -144,11 +147,24 @@ const loginHref = localizePath('/acceso', lang);
     }
 
     .logo {
-      font-size: 26px;
+      font-size: 20px;
     }
 
     .tools {
       gap: 0;
+    }
+  }
+
+  /* Folded phones (≈280px) */
+  @media (max-width: 300px) {
+    .bar {
+      gap: 4px;
+      padding-left: 12px;
+      padding-right: 8px;
+    }
+
+    .logo {
+      font-size: 17px;
     }
   }
 </style>

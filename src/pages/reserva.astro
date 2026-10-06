@@ -236,7 +236,8 @@ const steps = [1, 2, 3, 4, 5, 6] as const;
 
 <script>
   import { formatLongDate } from '../lib/dates';
-  import { LOCALE } from '../data/config';
+  import { localeFor } from '../data/config';
+  import type { Lang } from '../i18n/utils';
 
   document.addEventListener('astro:page-load', () => {
     const main = document.querySelector<HTMLElement>('[data-booking-main]');
@@ -246,7 +247,7 @@ const steps = [1, 2, 3, 4, 5, 6] as const;
     // Simulated confirmation screen
     main.addEventListener('booking:done', ((e: CustomEvent<{ date: string | null }>) => {
       const date = done.querySelector('[data-done-date]');
-      if (date) date.textContent = e.detail.date ? formatLongDate(e.detail.date, LOCALE) : '';
+      if (date) date.textContent = e.detail.date ? formatLongDate(e.detail.date, localeFor(document.documentElement.lang as Lang)) : '';
       main.hidden = true;
       done.hidden = false;
       window.scrollTo({ top: 0 });

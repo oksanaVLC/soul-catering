@@ -26,18 +26,20 @@ const t = useTranslations(lang);
       <h1>{t('home.hero.title')}</h1>
       <p class="text">{t('home.hero.text')}</p>
       <div class="ctas">
-        <Button href={localizePath('/reserva', lang)}>{t('home.hero.ctaBook')}</Button>
         <Button href="#servicios">{t('home.hero.ctaServices')}</Button>
+        <Button href={localizePath('/reserva', lang)}>{t('home.hero.ctaBook')}</Button>
       </div>
     </div>
   </div>
 </section>
 
 <style>
+  /* The section grows with its content (min-height, not height): on short or narrow
+     phones the copy is never pushed up beneath the overlay header. */
   .hero {
     position: relative;
-    height: 100svh;
-    min-height: 640px;
+    display: flex;
+    min-height: 100svh;
     overflow: hidden;
     background: var(--progress-bg);
   }
@@ -62,10 +64,10 @@ const t = useTranslations(lang);
   .content {
     position: relative;
     z-index: 1;
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    padding-top: calc(var(--header-h) + 48px);
     padding-bottom: 96px;
   }
 
@@ -102,15 +104,29 @@ const t = useTranslations(lang);
 
   @media (max-width: 700px) {
     .content {
-      padding-bottom: 56px;
+      padding-top: calc(var(--header-h) + 32px);
+      padding-bottom: 48px;
     }
 
     .copy {
-      gap: 20px;
+      gap: 18px;
+    }
+
+    h1 {
+      font-size: clamp(44px, 12vw, 56px);
     }
 
     .text {
-      font-size: 20px;
+      font-size: 19px;
+    }
+
+    .ctas {
+      gap: 10px;
+    }
+
+    .ctas :global(.btn) {
+      flex: 1 1 auto;
+      padding: 0 22px;
     }
   }
 </style>

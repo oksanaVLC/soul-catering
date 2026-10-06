@@ -9,10 +9,12 @@ import { demoEvent, demoGuests } from '../../data/guests';
 import { countGuests } from '../../lib/panel/guests';
 import { formatMediumDate } from '../../lib/dates';
 import { formatCents, percentOfCents } from '../../lib/money';
-import { DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS, LOCALE } from '../../data/config';
+import { DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS, localeFor } from '../../data/config';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
 
-const t = useTranslations(getLangFromUrl(Astro.url));
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const LOCALE = localeFor(lang);
 const counts = countGuests(demoGuests);
 // Amount paid = DEMO deposit on the example total (design: 1.200 € of 4.000 €, 30 %).
 const paid = percentOfCents(demoEvent.totalCents, DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS);
@@ -38,7 +40,7 @@ const stats = [
       <nav aria-label={t('common.breadcrumb')} class="crumbs">
         <a class="is-pending">{t('panel.breadcrumbBookings')}<span class="sr-only"> {t('a11y.pending')}</span></a>
         <span aria-hidden="true">/</span>
-        <span>{demoEvent.name}</span>
+        <span>{t(demoEvent.name)}</span>
       </nav>
       <h1>{t('panel.title')}</h1>
     </div>
@@ -64,11 +66,11 @@ const stats = [
       </div>
       <div>
         <dt>{t('panel.eventPlace')}</dt>
-        <dd>{demoEvent.venue}</dd>
+        <dd>{t(demoEvent.venue)}</dd>
       </div>
       <div>
         <dt>{t('panel.eventMenu')}</dt>
-        <dd>{demoEvent.menu}</dd>
+        <dd>{t(`menu.${demoEvent.menu}.name`)}</dd>
       </div>
     </dl>
     <div class="pay">

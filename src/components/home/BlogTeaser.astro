@@ -1,14 +1,15 @@
 ---
 import BlogCard from '../ui/BlogCard.astro';
 import Button from '../ui/Button.astro';
-import { homePosts } from '../../data/blog';
+import { getHomePosts } from '../../data/blog';
 import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const homePosts = getHomePosts(t);
 ---
 
-<section class="paperbg section" aria-labelledby="blog-title">
+<section class="bg-base section" aria-labelledby="blog-title">
   <div class="container inner">
     <div class="head">
       <div class="titles">
@@ -26,7 +27,6 @@ const t = useTranslations(lang);
 <style>
   .section {
     padding: 130px 0;
-    background: var(--bg);
   }
 
   .inner {

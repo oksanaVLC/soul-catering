@@ -31,14 +31,14 @@ const tabTexts = {
   <div class="access" data-access data-errors-text={JSON.stringify(errorTexts)} data-tabs={JSON.stringify(tabTexts)} data-panel-path={localizePath(DEMO_PANEL_PATH, lang)} data-demo-google={t('access.demoGoogle')} data-demo-register={t('access.demoRegister')}>
     <div class="side">
       <Image src={servilletaLazo} alt="" widths={[600, 900, 1200]} sizes="(max-width: 1040px) 100vw, 50vw" loading="eager" class="side-img" />
-      <a href={home} class="logo serif" aria-label={t('nav.home')}>{t('site.name')}</a>
+      <a href={home} class="logo logo-font" aria-label={t('nav.home')}>{t('site.name')}</a>
       <div class="side-copy">
         <p class="serif side-title">{t('access.sideTitle')}</p>
         <p class="side-text">{t('access.sideText')}</p>
       </div>
     </div>
 
-    <main id="main-content" class="paperbg content" transition:animate={fade({ duration: '300ms' })}>
+    <main id="main-content" class="bg-base content" transition:animate={fade({ duration: '300ms' })}>
       <div class="box">
         <div class="top">
           <a href={home} class="back">{t('access.back')}</a>

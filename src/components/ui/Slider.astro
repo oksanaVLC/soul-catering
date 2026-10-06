@@ -1,137 +1,208 @@
 ---
-// Horizontal slider: CSS scroll-snap, swipeable, with thick arrows (<button>).
-// From 1400px the arrows sit in the margin without background; below, over the content in a light circle.
+// Card gallery. Large screens: every card visible in a grid (no carousel).
+// Smaller screens: horizontal swipe carousel (CSS scroll-snap, no libraries) with
+// subtle controls BELOW the cards: back/forward arrows (<button> with aria-label)
+// and small dots that show how many cards there are and which one is in view.
 interface Props {
   prevLabel: string;
   nextLabel: string;
-  /** Vertical position of the arrows (design: 34–40 %). */
-  arrowTop?: string;
-  /** Class of the <ul>: 'gal' (cards in thirds or quarters) or 'track' (fixed width). */
-  trackClass?: 'gal' | 'track';
+  /** Columns of the grid on large screens. Incomplete last rows are centred. */
+  cols?: 3 | 4;
+  /** Width from which the grid replaces the carousel: lg = 1024px, xl = 1280px. */
+  gridFrom?: 'lg' | 'xl';
+  /** Wider than the text container (up to 1400px), for 4 columns of rich cards. */
+  wide?: boolean;
 }
 
-const { prevLabel, nextLabel, arrowTop = '38%', trackClass = 'gal' } = Astro.props;
+const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.props;
 ---
 
-<div class="slider" style={`--at:${arrowTop}`} data-slider>
-  <button type="button" class="sarrow l" aria-label={prevLabel} data-slider-prev>
-    <svg
-      width="34"
-      height="34"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="3"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"><path d="M20 12H5M11 5l-7 7 7 7"></path></svg
-    >
-  </button>
-  <button type="button" class="sarrow r" aria-label={nextLabel} data-slider-next>
-    <svg
-      width="34"
-      height="34"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="3"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"></path></svg
-    >
-  </button>
-  <ul class={trackClass} data-slider-track>
+<div class:list={['slider', `grid-${gridFrom}`, { wide }]} style={`--cols:${cols}`} data-slider>
+  <ul class="track" data-slider-track>
     <slot />
   </ul>
+  <div class="controls">
+    <button type="button" class="sarrow" aria-label={prevLabel} data-slider-prev>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"><path d="M20 12H5M11 5l-7 7 7 7"></path></svg
+      >
+    </button>
+    <!-- Visual indicator only: the arrows and swiping are the controls -->
+    <div class="dots" aria-hidden="true" data-slider-dots></div>
+    <button type="button" class="sarrow" aria-label={nextLabel} data-slider-next>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"></path></svg
+      >
+    </button>
+  </div>
 </div>
 
 <style>
   .slider {
-    max-width: 1320px;
+    --gap: 28px;
+    max-width: var(--container);
     margin: 0 auto;
-    position: relative;
   }
 
-  ul {
+  .wide {
+    max-width: 1400px;
+  }
+
+  /* ── Carousel (default) ── */
+  .track {
     /* positioned: so absolute children (.sr-only) stay clipped inside the track */
     position: relative;
     display: flex;
-    gap: 28px;
+    gap: var(--gap);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;
+    overscroll-behavior-x: contain;
     list-style: none;
     margin: 0;
-    padding: 4px 40px 28px;
-    scroll-padding-left: 40px;
+    padding: 4px var(--gutter) 24px;
+    scroll-padding-inline: var(--gutter);
   }
 
-  ul::-webkit-scrollbar {
+  .track::-webkit-scrollbar {
     display: none;
   }
 
-  .track {
-    padding-bottom: 24px;
+  .track > :global(li) {
+    flex: 0 0 calc((100% - var(--gap)) / 2);
+    min-width: 0;
+    scroll-snap-align: start;
   }
 
-  .sarrow {
-    position: absolute;
-    top: var(--at, 38%);
-    transform: translateY(-50%);
-    z-index: 5;
-    width: 60px;
-    height: 60px;
-    border: 0;
-    border-radius: 50%;
-    background: var(--surface);
-    color: var(--ink);
+  .controls {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 16px;
+    padding: 4px var(--gutter) 0;
+  }
+
+  .sarrow {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    background: var(--white);
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    box-shadow: 0 6px 22px rgba(20, 20, 20, 0.18);
-    transition: transform 0.2s ease;
-  }
-
-  .sarrow.l {
-    left: 12px;
-  }
-
-  .sarrow.r {
-    right: 12px;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
   }
 
   .sarrow:hover {
-    transform: translateY(-50%) scale(1.08);
+    border-color: var(--ink);
+    background: var(--light-hover);
   }
 
-  @media (min-width: 1400px) {
-    .sarrow {
-      background: none;
-      box-shadow: none;
-      width: 52px;
-    }
+  .sarrow:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
 
-    .sarrow.l {
-      left: -58px;
-    }
+  .sarrow:disabled:hover {
+    border-color: var(--line-strong);
+    background: var(--white);
+  }
 
-    .sarrow.r {
-      right: -58px;
+  .dots {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  /* Inactive: small round dot. Active: longer dark pill (shape, not just colour). */
+  .dots :global(span) {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--field-border-a11y);
+    transition:
+      width 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  .dots :global(span.on) {
+    width: 24px;
+    background: var(--ink);
+  }
+
+  @media (max-width: 700px) {
+    .track > :global(li) {
+      flex-basis: 84%;
     }
   }
 
-  @media (max-width: 900px) {
-    ul {
-      padding-left: 20px;
-      padding-right: 20px;
-      scroll-padding-left: 20px;
+  /* ── Grid: all the cards visible, no carousel ── */
+  @media (min-width: 1024px) {
+    .grid-lg .track {
+      flex-wrap: wrap;
+      justify-content: center;
+      overflow: visible;
+      scroll-snap-type: none;
+      padding-bottom: 0;
+      row-gap: 40px;
+    }
+
+    .grid-lg .track > :global(li) {
+      flex-basis: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+    }
+
+    .grid-lg .controls {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .grid-xl .track {
+      flex-wrap: wrap;
+      justify-content: center;
+      overflow: visible;
+      scroll-snap-type: none;
+      padding-bottom: 0;
+      row-gap: 40px;
+    }
+
+    .grid-xl .track > :global(li) {
+      flex-basis: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+    }
+
+    .grid-xl .controls {
+      display: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ul {
+    .track {
       scroll-behavior: auto;
     }
   }
@@ -141,11 +212,41 @@ const { prevLabel, nextLabel, arrowTop = '38%', trackClass = 'gal' } = Astro.pro
   document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLElement>('[data-slider]').forEach((slider) => {
       const track = slider.querySelector<HTMLElement>('[data-slider-track]');
-      if (!track) return;
-      const go = (dir: number) =>
-        track.scrollBy({ left: dir * Math.max(300, track.clientWidth * 0.8), behavior: 'smooth' });
-      slider.querySelector('[data-slider-prev]')?.addEventListener('click', () => go(-1));
-      slider.querySelector('[data-slider-next]')?.addEventListener('click', () => go(1));
+      const dotsBox = slider.querySelector<HTMLElement>('[data-slider-dots]');
+      const prev = slider.querySelector<HTMLButtonElement>('[data-slider-prev]');
+      const next = slider.querySelector<HTMLButtonElement>('[data-slider-next]');
+      if (!track || !dotsBox || !prev || !next) return;
+      const items = Array.from(track.children) as HTMLElement[];
+      if (!items.length) return;
+
+      dotsBox.replaceChildren(...items.map(() => document.createElement('span')));
+      const dots = Array.from(dotsBox.children);
+
+      // Distance between the start of two consecutive cards
+      const step = () => (items[1] ? items[1].offsetLeft - items[0].offsetLeft : track.clientWidth);
+
+      const update = () => {
+        const max = track.scrollWidth - track.clientWidth;
+        const atEnd = track.scrollLeft >= max - 2;
+        const index = atEnd ? items.length - 1 : Math.round(track.scrollLeft / step());
+        dots.forEach((dot, i) => dot.classList.toggle('on', i === index));
+        prev.disabled = track.scrollLeft <= 2;
+        next.disabled = atEnd;
+      };
+
+      let frame = 0;
+      track.addEventListener(
+        'scroll',
+        () => {
+          cancelAnimationFrame(frame);
+          frame = requestAnimationFrame(update);
+        },
+        { passive: true },
+      );
+      new ResizeObserver(update).observe(track);
+      prev.addEventListener('click', () => track.scrollBy({ left: -step() }));
+      next.addEventListener('click', () => track.scrollBy({ left: step() }));
+      update();
     });
   });
 </script>

@@ -1,0 +1,9 @@
+---
+// Same page in en / fr / ru: the language comes from the URL (getLangFromUrl).
+import Page from '../../servicios/bodas.astro';
+import { localizedPaths } from '../../../i18n/utils';
+
+export const getStaticPaths = localizedPaths;
+---
+
+<Page />

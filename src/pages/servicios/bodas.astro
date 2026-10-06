@@ -24,54 +24,28 @@ const moments = [
   { image: mesaDulce, n: 3 },
 ] as const;
 
-// Example menu from the design (dish names and placeholders).
+// Example menu from the design (dish names and placeholders). Allergens: allergen.<id>.
 const menuGroups = [
   {
     title: t('bodas.menuCocktail'),
     dishes: [
-      { name: 'Tartaletas de remolacha', allergens: ['Gluten', 'Lácteos'] },
-      { name: 'Mini brochetas de fruta y coco', allergens: [] },
+      { name: t('bodas.dish1'), allergens: [t('allergen.gluten'), t('allergen.lacteos')] },
+      { name: t('bodas.dish2'), allergens: [] },
     ],
   },
   {
     title: t('bodas.menuBanquet'),
     dishes: [
-      { name: '[ENTRANTE]', allergens: ['[ALÉRGENOS]'] },
-      { name: '[PLATO PRINCIPAL]', allergens: ['[ALÉRGENOS]'] },
-      { name: 'Brownie con menta', allergens: ['Huevo', 'Gluten'] },
+      { name: t('bodas.dishStarter'), allergens: [t('bodas.allergensPh')] },
+      { name: t('bodas.dishMain'), allergens: [t('bodas.allergensPh')] },
+      { name: t('bodas.dish5'), allergens: [t('allergen.huevo'), t('allergen.gluten')] },
     ],
   },
 ];
 
-const extraRows = [
-  ['Floristería', 'Decoración básica, premium y centros de mesa'],
-  ['Fotografía', 'Cobertura básica, completa o vídeo profesional'],
-  ['Personal extra', 'Camareros adicionales y coordinador de evento'],
-  ['Detalles para invitados', 'Regalos y detalles personalizados'],
-];
-
-const process = [
-  ['Reserva online', 'Menú orientativo, invitados, fecha y lugar.'],
-  ['Señal y fecha bloqueada', 'La fecha queda confirmada al recibir la señal.'],
-  ['Degustación', 'Probáis el menú y cerramos los detalles.'],
-  ['Invitados y alergias', 'Subís la lista y cada alergia queda registrada.'],
-];
-
-const faq = [
-  {
-    q: '¿Con cuánta antelación debemos reservar?',
-    a: '[RESPUESTA — p. ej. recomendamos entre X y Y meses en temporada alta.]',
-  },
-  {
-    q: '¿Cuánto es la señal y cuándo se paga el resto?',
-    a: '[PORCENTAJE DE SEÑAL] al reservar; el resto antes del evento.',
-  },
-  {
-    q: '¿Adaptáis el menú a alergias e intolerancias?',
-    a: 'Sí. Cada invitado puede indicar sus alergias y las tenemos en cuenta plato a plato.',
-  },
-  { q: '¿Trabajáis fuera de Valencia ciudad?', a: '[ZONA DE SERVICIO]' },
-];
+const extraRows = [1, 2, 3, 4].map((n) => [t(`bodas.x${n}Name`), t(`bodas.x${n}Text`)]);
+const process = [1, 2, 3, 4].map((n) => [t(`bodas.p${n}Title`), t(`bodas.p${n}Text`)]);
+const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) }));
 ---
 
 <BaseLayout title={t('bodas.title')} footer="compact">
@@ -144,7 +118,7 @@ const faq = [
   </section>
 
   <!-- Example menu -->
-  <section id="menu" class="paperbg block" aria-labelledby="menu-title">
+  <section id="menu" class="bg-base block" aria-labelledby="menu-title">
     <div class="container menu-grid">
       <div class="menu-intro">
         <p class="eyebrow">{t('bodas.menuEyebrow')}</p>
@@ -253,7 +227,7 @@ const faq = [
   </section>
 
   <!-- CTA -->
-  <section class="paperbg block cta" aria-labelledby="cta-title">
+  <section class="bg-base block cta" aria-labelledby="cta-title">
     <div class="container cta-inner">
       <h2 id="cta-title">{t('bodas.ctaTitle')}</h2>
       <p class="lead">{t('bodas.ctaText')}</p>

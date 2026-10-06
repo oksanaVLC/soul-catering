@@ -1,7 +1,7 @@
 // Centralized booking configuration. Without imports from Astro or the DOM (usable in tests).
 // IMPORTANT: commercial values are DEMO. In a phase with real payments the server
 // must recalculate all amounts; never trust what the browser sends.
-import type { ReservationConfig, ReservationInput } from '../types/reservation.ts';
+import type { Lang, ReservationConfig, ReservationInput } from '../types/reservation.ts';
 
 /** Deposit percentage. DEMO / PENDING DECISION (demo value: 30). */
 export const DEPOSIT_PERCENT = 30;
@@ -63,3 +63,10 @@ export const BOOKING_DEFAULTS: ReservationInput = {
 };
 
 export const LOCALE = 'es-ES';
+
+/** Locale for dates and amounts in each language (prices are always in euros). */
+const LOCALES: Record<Lang, string> = { es: 'es-ES', en: 'en-GB', fr: 'fr-FR', ru: 'ru-RU' };
+
+export function localeFor(lang: Lang): string {
+  return LOCALES[lang];
+}

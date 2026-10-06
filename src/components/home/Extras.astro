@@ -2,14 +2,15 @@
 import Slider from '../ui/Slider.astro';
 import ExtraCard from '../ui/ExtraCard.astro';
 import Button from '../ui/Button.astro';
-import { extras } from '../../data/extras';
+import { getExtras, HOME_EXTRAS_COUNT } from '../../data/extras';
 import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const homeExtras = getExtras(t).slice(0, HOME_EXTRAS_COUNT);
 ---
 
-<section id="extras" class="paperbg section" aria-labelledby="extras-title">
+<section id="extras" class="bg-base section" aria-labelledby="extras-title">
   <div class="container">
     <div class="head">
       <p class="eyebrow">{t('home.extras.eyebrow')}</p>
@@ -17,8 +18,8 @@ const t = useTranslations(lang);
       <p class="lead">{t('home.extras.text')}</p>
     </div>
   </div>
-  <Slider prevLabel={t('home.extras.prev')} nextLabel={t('home.extras.next')} arrowTop="34%">
-    {extras.map((extra, i) => <ExtraCard extra={extra} index={i} />)}
+  <Slider prevLabel={t('home.extras.prev')} nextLabel={t('home.extras.next')} cols={4}>
+    {homeExtras.map((extra, i) => <ExtraCard extra={extra} index={i} />)}
   </Slider>
   <div class="container more">
     <Button href={localizePath('/extras', lang)}>{t('home.extras.cta')}</Button>
@@ -28,7 +29,6 @@ const t = useTranslations(lang);
 <style>
   .section {
     padding: 130px 0 110px;
-    background: var(--bg);
   }
 
   .head {
@@ -44,7 +44,7 @@ const t = useTranslations(lang);
   }
 
   .more {
-    margin-top: 32px;
+    margin-top: 40px;
     display: flex;
     justify-content: center;
   }

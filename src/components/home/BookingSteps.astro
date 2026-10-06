@@ -49,8 +49,8 @@ const steps = [1, 2, 3, 4, 5, 6] as const;
     </ol>
     <p class="secure">
       <svg
-        width="28"
-        height="28"
+        width="26"
+        height="26"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -151,16 +151,22 @@ const steps = [1, 2, 3, 4, 5, 6] as const;
     text-underline-offset: 4px;
   }
 
+  /* The lock is aligned with the first line («Pago seguro…»), not with the centre of the block */
   .secure {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     font-size: 18px;
+    line-height: 1.6;
     max-width: 360px;
   }
 
   .secure svg {
     flex: none;
+    width: 26px;
+    height: 26px;
+    /* (line-height 18px × 1.6 = 28.8px − 26px) / 2 */
+    margin-top: 1px;
     color: var(--gold);
   }
 

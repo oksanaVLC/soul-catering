@@ -1,19 +1,20 @@
 ---
 import Slider from '../ui/Slider.astro';
 import ServiceCard from '../ui/ServiceCard.astro';
-import { services } from '../../data/services';
+import { getServices } from '../../data/services';
 import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const services = getServices(t);
 ---
 
-<section id="servicios" class="paperbg section" aria-labelledby="servicios-title">
+<section id="servicios" class="bg-base section" aria-labelledby="servicios-title">
   <div class="container head">
     <p class="eyebrow">{t('home.services.eyebrow')}</p>
     <h2 id="servicios-title">{t('home.services.title')}</h2>
   </div>
-  <Slider prevLabel={t('home.services.prev')} nextLabel={t('home.services.next')} arrowTop="36%">
+  <Slider prevLabel={t('home.services.prev')} nextLabel={t('home.services.next')} cols={3}>
     {
       services.map((s) => (
         <ServiceCard
@@ -31,7 +32,6 @@ const t = useTranslations(lang);
 <style>
   .section {
     padding: 130px 0 110px;
-    background: var(--surface);
   }
 
   .head {

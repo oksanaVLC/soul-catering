@@ -79,7 +79,7 @@ const columns = [
 
         <div class="cols">
           <div class="brand">
-            <span class="serif">{t('site.name')}</span>
+            <span class="logo-font">{t('site.name')}</span>
             <p>
               {t('footer.address')}
               <br />
@@ -149,7 +149,7 @@ const columns = [
   ) : (
     <footer class="foot compact">
       <div class="container row">
-        <span class="serif logo">{t('site.name')}</span>
+        <span class="logo-font logo">{t('site.name')}</span>
         <nav aria-label={t('footer.compactLabel')} class="links">
           {compactLinks.map((l) =>
             l.href ? (
@@ -297,7 +297,7 @@ const columns = [
     gap: 16px;
   }
 
-  .brand .serif {
+  .brand .logo-font {
     color: var(--white);
     font-size: 34px;
   }

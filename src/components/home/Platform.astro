@@ -4,7 +4,7 @@
 // that is why some of their texts are smaller than 15px, as in the design.
 import Slider from '../ui/Slider.astro';
 import Button from '../ui/Button.astro';
-import { DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS, LOCALE } from '../../data/config';
+import { DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS, localeFor } from '../../data/config';
 import { formatCents, percentOfCents } from '../../lib/money';
 import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
 
@@ -16,11 +16,17 @@ const slides = [1, 2, 3, 4, 5, 6, 7] as const;
 const calDays = Array.from({ length: 28 }, (_, i) => i + 1);
 const calFull = [7, 14, 15, 21, 28];
 const calSelected = 6;
+const cap = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+const calDate = new Date(Date.UTC(2026, 10, calSelected));
+const dateIn = (opts: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat(localeFor(lang), { ...opts, timeZone: 'UTC' }).format(calDate);
+const calTitle = cap(dateIn({ month: 'long', year: 'numeric' }).replace(' de ', ' '));
+const calSelectedLabel = dateIn({ weekday: 'long', day: 'numeric' });
 
 // Mini-screen 7 (decorative): example total from the design (4.000 €), with the configured deposit.
 const mockTotal = 400000; // cents
 const mockPaid = percentOfCents(mockTotal, DEPOSIT_PERCENT, DEPOSIT_ROUNDING_CENTS);
-const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: true });
+const eur = (cents: number) => formatCents(cents, { locale: localeFor(lang), grouping: true });
 ---
 
 <section id="plataforma" class="silver section" aria-labelledby="plataforma-title">
@@ -28,43 +34,38 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
     <p class="eyebrow">{t('home.platform.eyebrow')}</p>
     <h2 id="plataforma-title">{t('home.platform.title')}</h2>
   </div>
-  <Slider
-    prevLabel={t('home.platform.prev')}
-    nextLabel={t('home.platform.next')}
-    arrowTop="40%"
-    trackClass="track"
-  >
+  <Slider prevLabel={t('home.platform.prev')} nextLabel={t('home.platform.next')} cols={4} gridFrom="xl" wide>
     {
       slides.map((n) => (
         <li class="slide">
-          <div class="mock paperbg" aria-hidden="true">
+          <div class="mock bg-base" aria-hidden="true">
             <div class="mock-card">
               {n === 1 && (
                 <>
                   <div class="mock-h">
-                    <span>Menú Banquete</span>
-                    <span class="mute">[PRECIO] €/pers.</span>
+                    <span>{t('mock.menuTitle')}</span>
+                    <span class="mute">{t('mock.menuPrice')}</span>
                   </div>
                   <div class="mrow">
-                    <span>Tartaletas de remolacha</span>
-                    <span class="chip-s">Gluten</span>
+                    <span>{t('bodas.dish1')}</span>
+                    <span class="chip-s">{t('allergen.gluten')}</span>
                   </div>
                   <div class="mrow">
-                    <span>Brochetas de fruta</span>
-                    <span class="chip-s ok">Sin alérgenos</span>
+                    <span>{t('mock.dish2')}</span>
+                    <span class="chip-s ok">{t('home.menus.noAllergens')}</span>
                   </div>
                   <div class="mrow">
-                    <span>Brownie con menta</span>
-                    <span class="chip-s">Huevo</span>
+                    <span>{t('bodas.dish5')}</span>
+                    <span class="chip-s">{t('allergen.huevo')}</span>
                   </div>
-                  <div class="mock-btn">Elegir este menú</div>
+                  <div class="mock-btn">{t('mock.chooseMenu')}</div>
                 </>
               )}
               {n === 2 && (
                 <>
-                  <div class="mock-h">Invitados</div>
+                  <div class="mock-h">{t('booking.sumGuests')}</div>
                   <div class="mrow">
-                    <span>Adultos</span>
+                    <span>{t('mock.adults')}</span>
                     <span class="stepper">
                       <span>−</span>
                       <strong>80</strong>
@@ -72,7 +73,7 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
                     </span>
                   </div>
                   <div class="mrow">
-                    <span>Niños</span>
+                    <span>{t('mock.kids')}</span>
                     <span class="stepper">
                       <span>−</span>
                       <strong>10</strong>
@@ -80,8 +81,8 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
                     </span>
                   </div>
                   <div class="mock-h top">
-                    <span>Total estimado</span>
-                    <span>[IMPORTE] €</span>
+                    <span>{t('booking.total')}</span>
+                    <span>{t('mock.amount')}</span>
                   </div>
                 </>
               )}
@@ -89,7 +90,7 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
                 <>
                   <div class="mock-h">
                     <span>‹</span>
-                    <span>Noviembre 2026</span>
+                    <span>{calTitle}</span>
                     <span>›</span>
                   </div>
                   <div class="cal">
@@ -104,66 +105,66 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
                       </span>
                     ))}
                   </div>
-                  <div class="small mute">Tu fecha: viernes 6</div>
+                  <div class="small mute">{t('mock.yourDate', { day: calSelectedLabel })}</div>
                 </>
               )}
               {n === 4 && (
                 <>
-                  <div class="mock-h">Lugar del evento</div>
-                  <div class="box mute">Finca [NOMBRE], Camí…</div>
+                  <div class="mock-h">{t('mock.venue')}</div>
+                  <div class="box mute">{t('mock.venueAddress')}</div>
                   <div class="box">Valencia</div>
                   <div class="two">
-                    <span class="box center">Interior</span>
-                    <span class="box center on">Exterior</span>
+                    <span class="box center">{t('booking.indoor')}</span>
+                    <span class="box center on">{t('booking.outdoor')}</span>
                   </div>
                 </>
               )}
               {n === 5 && (
                 <>
                   <div class="mock-h">
-                    <span>Invitados</span>
-                    <span class="small mute">96 de 120 confirmados</span>
+                    <span>{t('booking.sumGuests')}</span>
+                    <span class="small mute">{t('mock.confirmedOf', { n: 96, total: 120 })}</span>
                   </div>
                   <div class="mrow">
                     <span>Carmen López</span>
-                    <span class="chip-s ok">Confirmado</span>
+                    <span class="chip-s ok">{t('panel.status.confirmed')}</span>
                   </div>
                   <div class="mrow">
                     <span>Pablo Ruiz</span>
-                    <span class="chip-s wait">Pendiente</span>
+                    <span class="chip-s wait">{t('panel.status.pending')}</span>
                   </div>
                   <div class="mrow">
                     <span>Anna Petrova</span>
-                    <span class="chip-s ok">Confirmado</span>
+                    <span class="chip-s ok">{t('panel.status.confirmed')}</span>
                   </div>
                   <div class="mrow">
                     <span>Claire Dubois</span>
-                    <span class="chip-s wait">Pendiente</span>
+                    <span class="chip-s wait">{t('panel.status.pending')}</span>
                   </div>
                 </>
               )}
               {n === 6 && (
                 <>
-                  <div class="mock-h">Mis alergias · Anna P.</div>
+                  <div class="mock-h">{t('mock.myAllergies')}</div>
                   {[
-                    ['Gluten', false],
-                    ['Lácteos', true],
-                    ['Huevo', true],
-                    ['Frutos secos', false],
-                    ['Marisco', false],
-                  ].map(([name, on]) => (
+                    ['gluten', false],
+                    ['lacteos', true],
+                    ['huevo', true],
+                    ['frutos-secos', false],
+                    ['marisco', false],
+                  ].map(([id, on]) => (
                     <div class="tick-row">
                       <span class:list={['tick', { on }]}>{on ? '✓' : ''}</span>
-                      {name}
+                      {t(`guestAllergen.${id}`)}
                     </div>
                   ))}
-                  <div class="small sent">Enviado a cocina</div>
+                  <div class="small sent">{t('mock.sentKitchen')}</div>
                 </>
               )}
               {n === 7 && (
                 <>
                   <div class="mock-h">
-                    <span>Pagado hasta ahora</span>
+                    <span>{t('mock.paidSoFar')}</span>
                     <span>{DEPOSIT_PERCENT}%</span>
                   </div>
                   <div class="big">{eur(mockPaid)}</div>
@@ -171,11 +172,11 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
                     <div style={`width:${DEPOSIT_PERCENT}%`} />
                   </div>
                   <div class="small mute">
-                    Quedan {eur(mockTotal - mockPaid)} de {eur(mockTotal)}
+                    {t('panel.remaining', { rest: eur(mockTotal - mockPaid), total: eur(mockTotal) })}
                   </div>
                   <div class="mrow plain">
-                    <span class="chip-s ok">Señal pagada</span>
-                    <span class="chip-s wait">Resto pendiente</span>
+                    <span class="chip-s ok">{t('mock.depositPaid')}</span>
+                    <span class="chip-s wait">{t('mock.restPending')}</span>
                   </div>
                 </>
               )}
@@ -191,7 +192,6 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
     }
   </Slider>
   <div class="container foot-row">
-    <p>{t('common.swipe')}</p>
     <Button href={localizePath('/reserva', lang)}>{t('home.platform.cta')}</Button>
   </div>
 </section>
@@ -214,8 +214,6 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
   }
 
   .slide {
-    flex: 0 0 min(380px, 82%);
-    scroll-snap-align: start;
     display: flex;
     flex-direction: column;
     background: var(--white);
@@ -460,17 +458,20 @@ const eur = (cents: number) => formatCents(cents, { locale: LOCALE, grouping: tr
   }
 
   .foot-row {
-    margin-top: 32px;
+    margin-top: 40px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .foot-row p {
-    font-size: 17px;
-    color: var(--text-2);
+  /* Grid of 4 (large screens): the decorative mini-screens are scaled down to fit the square */
+  @media (min-width: 1280px) {
+    .mock {
+      padding: 16px;
+    }
+
+    .mock-card {
+      zoom: 0.8;
+    }
   }
 
   @media (max-width: 700px) {

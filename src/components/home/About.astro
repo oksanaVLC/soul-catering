@@ -8,15 +8,17 @@ const facts = [1, 2, 3] as const;
 ---
 
 <!-- DEMO: «Nosotros» texts are example text (visible notice from the design). -->
-<section id="sobre-nosotros" class="paperbg section" aria-labelledby="nosotros-title">
-  <Image
-    src={cocineros}
-    alt={t('home.about.alt')}
-    widths={[800, 1280, 1920, 2560]}
-    sizes="100vw"
-    loading="lazy"
-    class="photo"
-  />
+<section id="sobre-nosotros" class="bg-base section" aria-labelledby="nosotros-title">
+  <div class="container photo-wrap">
+    <Image
+      src={cocineros}
+      alt={t('home.about.alt')}
+      widths={[800, 1280, 1920, 2560]}
+      sizes="(min-width: 1240px) 1160px, 100vw"
+      loading="lazy"
+      class="photo"
+    />
+  </div>
   <div class="container inner">
     <p class="eyebrow">{t('home.about.eyebrow')}</p>
     <h2 id="nosotros-title">{t('home.about.title')}</h2>
@@ -27,14 +29,12 @@ const facts = [1, 2, 3] as const;
       <p class="lead">{t('home.about.p4')}</p>
     </div>
     <ul class="facts">
-      {
-        facts.map((n) => (
-          <li>
-            <strong>{t(`home.about.f${n}Title`)}</strong>
-            <span>{t(`home.about.f${n}Text`)}</span>
-          </li>
-        ))
-      }
+      {facts.map((n) => (
+        <li>
+          <strong>{t(`home.about.f${n}Title`)}</strong>
+          <span>{t(`home.about.f${n}Text`)}</span>
+        </li>
+      ))}
     </ul>
     <p class="demo">{t('home.about.demo')}</p>
   </div>
@@ -43,7 +43,6 @@ const facts = [1, 2, 3] as const;
 <style>
   .section {
     padding: 0 0 130px;
-    background: var(--surface);
   }
 
   .photo {
@@ -54,7 +53,6 @@ const facts = [1, 2, 3] as const;
   }
 
   .inner {
-    max-width: 1000px;
     padding-top: 96px;
     display: flex;
     flex-direction: column;
@@ -108,6 +106,12 @@ const facts = [1, 2, 3] as const;
   @media (max-width: 700px) {
     .section {
       padding-bottom: 88px;
+    }
+
+    /* Mobile: the photo goes edge to edge, without side padding */
+    .photo-wrap {
+      padding-left: 0;
+      padding-right: 0;
     }
 
     .inner {

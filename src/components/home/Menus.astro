@@ -1,0 +1,384 @@
+---
+// «Nuestros menús»: the 3 booking menus with their DEMO price and a «Ver platos» button
+// that opens a native <dialog> with the dishes (photo, short description and allergens).
+import { Image } from 'astro:assets';
+import Slider from '../ui/Slider.astro';
+import Button from '../ui/Button.astro';
+import { menus } from '../../data/menus';
+import { dishesByMenu, dishImage } from '../../data/dishes';
+import { localeFor } from '../../data/config';
+import { formatAmount } from '../../lib/money';
+import { getLangFromUrl, localizePath, useTranslations, type Key } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const bookHref = localizePath('/reserva', lang);
+const price = (cents: number) => t('booking.perPerson', { price: formatAmount(cents, { locale: localeFor(lang) }) });
+---
+
+<!-- DEMO: example dishes and prices («Precios de ejemplo»). -->
+<section id="menus" class="bg-base section" aria-labelledby="menus-title">
+  <div class="container head">
+    <p class="eyebrow">{t('home.menus.eyebrow')}</p>
+    <h2 id="menus-title">{t('home.menus.title')}</h2>
+    <p class="lead">{t('home.menus.text')}</p>
+    <p class="demo">{t('home.menus.demo')}</p>
+  </div>
+
+  <Slider prevLabel={t('home.menus.prev')} nextLabel={t('home.menus.next')} cols={3}>
+    {menus.map((m) => {
+      const name = t(`menu.${m.id}.name` as Key);
+      return (
+        <li class="mcard">
+          <Image
+            src={m.image}
+            alt=""
+            widths={[400, 600, 800]}
+            sizes="(max-width: 700px) 84vw, (max-width: 1023px) 50vw, 370px"
+            loading="lazy"
+          />
+          <div class="mcard-body">
+            <h3>{name}</h3>
+            <p>{t(`menu.${m.id}.desc` as Key)}</p>
+            <p class="price">{price(m.pricePerAdultCents)}</p>
+            <Button
+              variant="light"
+              class="see"
+              aria-haspopup="dialog"
+              aria-label={t('home.menus.seeLabel', { name })}
+              data-dialog-open={`platos-${m.id}`}
+            >
+              {t('home.menus.see')}
+            </Button>
+          </div>
+        </li>
+      );
+    })}
+  </Slider>
+
+  {menus.map((m) => {
+    const name = t(`menu.${m.id}.name` as Key);
+    return (
+      <dialog id={`platos-${m.id}`} class="dishes" aria-labelledby={`platos-${m.id}-title`} data-dialog>
+        <div class="dlg-head">
+          <div>
+            <h3 id={`platos-${m.id}-title`}>{t('home.menus.dishesTitle', { name })}</h3>
+            <p class="price">{price(m.pricePerAdultCents)}</p>
+          </div>
+          <button type="button" class="close" aria-label={t('home.menus.close')} data-dialog-close>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg
+            >
+          </button>
+        </div>
+        <ul class="dish-list">
+          {dishesByMenu[m.id]?.map((d) => (
+            <li class="dish">
+              <Image
+                src={dishImage}
+                alt=""
+                widths={[208, 320, 480, 640]}
+                sizes="(max-width: 560px) 104px, (max-width: 700px) 90vw, 280px"
+                loading="lazy"
+              />
+              <div class="dish-body">
+                <h4>{t(`dish.${d.id}.name` as Key)}</h4>
+                <p>{t(`dish.${d.id}.desc` as Key)}</p>
+                <p class="allergens">
+                  <span class="sr-only">{t('home.menus.allergens')}: </span>
+                  {d.allergens.length ? (
+                    d.allergens.map((a) => <span class="chip-a">{t(`allergen.${a}` as Key)}</span>)
+                  ) : (
+                    <span class="chip-a none">{t('home.menus.noAllergens')}</span>
+                  )}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div class="dlg-foot">
+          <p class="demo">{t('home.menus.dishesDemo')}</p>
+          <Button href={bookHref}>{t('home.menus.book')}</Button>
+        </div>
+      </dialog>
+    );
+  })}
+</section>
+
+<style>
+  .section {
+    padding: 130px 0 110px;
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 52px;
+  }
+
+  .head h2,
+  .head .lead {
+    max-width: 760px;
+  }
+
+  .head .lead {
+    font-size: 19px;
+  }
+
+  .demo {
+    font-size: 15px;
+    color: var(--text-4);
+  }
+
+  /* ── Menu card ── */
+  .mcard {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(58, 36, 24, 0.08);
+    border: 1px solid var(--line-card);
+  }
+
+  .mcard :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .mcard-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 26px 28px 28px;
+    flex: 1;
+  }
+
+  h3 {
+    font-size: 32px;
+  }
+
+  .mcard-body p {
+    color: var(--text-2);
+    font-size: 18px;
+  }
+
+  .mcard-body .price,
+  .dlg-head .price {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* The button sits at the bottom, so the three cards line up */
+  .mcard-body :global(.see) {
+    margin-top: auto;
+  }
+
+  .mcard-body .price {
+    margin-bottom: 8px;
+  }
+
+  /* ── Dialog with the dishes ── */
+  .dishes {
+    width: min(1000px, calc(100% - 32px));
+    max-height: calc(100svh - 32px);
+    padding: 0;
+    border: 0;
+    border-radius: 20px;
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: 0 24px 60px rgba(20, 20, 20, 0.3);
+  }
+
+  .dishes::backdrop {
+    background: rgba(20, 20, 20, 0.6);
+  }
+
+  .dlg-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 28px 32px 20px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dlg-head h3 {
+    font-size: clamp(30px, 4vw, 40px);
+  }
+
+  .close {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: var(--white);
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    background: var(--light-hover);
+  }
+
+  .dish-list {
+    list-style: none;
+    margin: 0;
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr));
+    gap: 24px;
+  }
+
+  .dish {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line-card);
+  }
+
+  .dish :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .dish-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 20px 20px;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+
+  .dish-body p {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  .allergens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .chip-a {
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 2px 12px;
+    background: var(--allergen-bg);
+    color: var(--allergen);
+  }
+
+  .chip-a.none {
+    background: var(--ok-bg);
+    color: var(--ok);
+  }
+
+  .dlg-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 0 32px 32px;
+  }
+
+  @media (max-width: 700px) {
+    .section {
+      padding: 88px 0 72px;
+    }
+
+    .head {
+      margin-bottom: 36px;
+    }
+
+    .dlg-head {
+      padding: 20px 20px 16px;
+    }
+
+    .dish-list {
+      padding: 20px;
+    }
+
+    .dlg-foot {
+      padding: 0 20px 24px;
+    }
+  }
+
+  /* Phones: dish in a row (square photo on the left) so several fit on screen */
+  @media (max-width: 560px) {
+    .dish {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .dish :global(img) {
+      width: 104px;
+      flex: none;
+      aspect-ratio: 1 / 1;
+      align-self: stretch;
+      height: auto;
+      max-height: 160px;
+    }
+
+    .dish-body {
+      padding: 14px 16px 16px;
+      min-width: 0;
+    }
+  }
+
+  :global(html:has(dialog[open])) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  // Native <dialog>: Esc closes it and the browser returns the focus to the button.
+  // It also closes when clicking the dark backdrop.
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-dialog-open]').forEach((btn) => {
+      const dialog = document.getElementById(btn.dataset.dialogOpen ?? '');
+      if (!(dialog instanceof HTMLDialogElement)) return;
+      btn.addEventListener('click', () => dialog.showModal());
+    });
+    document.querySelectorAll<HTMLDialogElement>('[data-dialog]').forEach((dialog) => {
+      dialog.querySelector('[data-dialog-close]')?.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (e) => {
+        if (e.target === dialog) dialog.close();
+      });
+    });
+  });
+</script>

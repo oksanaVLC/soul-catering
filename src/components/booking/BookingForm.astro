@@ -9,13 +9,14 @@ import Calendar from './Calendar.astro';
 import GuestCounter from './GuestCounter.astro';
 import { menus } from '../../data/menus';
 import { bookingCatalog } from '../../data/booking-catalog';
-import { BOOKING_DEFAULTS, LOCALE, REQUIRED_VENUE_FIELDS } from '../../data/config';
+import { BOOKING_DEFAULTS, localeFor, REQUIRED_VENUE_FIELDS } from '../../data/config';
 import { formatAmount, formatCents } from '../../lib/money';
 import es from '../../i18n/es.json';
 import { getLangFromUrl, languages, localizePath, useTranslations } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const LOCALE = localeFor(lang);
 const initial = BOOKING_DEFAULTS;
 // Required «Lugar» fields from the configuration (PENDING DECISION): exposed to assistive technology.
 const venueRequired = (field: string) => (REQUIRED_VENUE_FIELDS as readonly string[]).includes(field);
@@ -36,6 +37,8 @@ const summaryTexts = {
   interior: t('booking.indoor'),
   exterior: t('booking.outdoor'),
 };
+// Menu names in the page language (the catalog only has ids and prices for the browser).
+const menuNames = Object.fromEntries(menus.map((m) => [m.id, t(`menu.${m.id}.name`)]));
 ---
 
 <form
@@ -46,6 +49,8 @@ const summaryTexts = {
   data-errors-text={JSON.stringify(errorMessages)}
   data-summary-text={JSON.stringify(summaryTexts)}
   data-languages={JSON.stringify(languages)}
+  data-menu-names={JSON.stringify(menuNames)}
+  data-locale={LOCALE}
 >
   <div class="errors" role="alert" tabindex="-1" hidden data-errors>
     <h2>{t('booking.errorsTitle')}</h2>
@@ -72,8 +77,8 @@ const summaryTexts = {
               loading="lazy"
             />
             <span class="menu-body">
-              <span class="menu-name">{m.name}</span>
-              <span class="menu-desc">{m.description}</span>
+              <span class="menu-name">{t(`menu.${m.id}.name`)}</span>
+              <span class="menu-desc">{t(`menu.${m.id}.desc`)}</span>
               <span class="menu-price">
                 {t('booking.perPerson', { price: formatAmount(m.pricePerAdultCents, { locale: LOCALE }) })}
               </span>
@@ -241,7 +246,7 @@ const summaryTexts = {
               checked={initial.extraIds.includes(x.id)}
               data-input="extra"
             />
-            <span class="grow">{x.name}</span>
+            <span class="grow">{t(`bookExtra.${x.id}`)}</span>
             <span class="price">+{formatCents(x.priceCents, { locale: LOCALE })}</span>
           </label>
         ))
@@ -329,7 +334,7 @@ const summaryTexts = {
                   checked={initial.allergenIds.includes(allergen.id)}
                   data-input="allergen"
                 />
-                {allergen.label}
+                {t(`allergen.${allergen.id}`)}
               </label>
             ))
           }
@@ -623,7 +628,7 @@ const summaryTexts = {
   import { formatLongDate, todayIso } from '../../lib/dates';
   import { bookingCatalog } from '../../data/booking-catalog';
   import { availability } from '../../data/availability';
-  import { BOOKING_DEFAULTS, LOCALE, reservationConfig } from '../../data/config';
+  import { BOOKING_DEFAULTS, reservationConfig } from '../../data/config';
   import type {
     GuestGroup,
     Lang,
@@ -659,6 +664,8 @@ const summaryTexts = {
     const errorTexts: Record<string, string> = JSON.parse(form.dataset.errorsText ?? '{}');
     const texts: Record<string, string> = JSON.parse(form.dataset.summaryText ?? '{}');
     const languages: string[] = JSON.parse(form.dataset.languages ?? '[]');
+    const menuNames: Record<string, string> = JSON.parse(form.dataset.menuNames ?? '{}');
+    const LOCALE = form.dataset.locale ?? 'es-ES';
     const fill = (tpl: string, vars: Record<string, string | number>) =>
       tpl.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''));
     const money = (cents: number) => formatCents(cents, { locale: LOCALE });
@@ -681,7 +688,7 @@ const summaryTexts = {
       const status = getDayStatus(day.dataset.date ?? '', { availability, config: reservationConfig, today });
       day.disabled = !isSelectable(status);
       day.classList.toggle('out', ['past', 'out-of-range', 'no-data'].includes(status));
-      day.dataset.baseLabel = `${day.dataset.day} de ${day.dataset.monthName}, ${statusLabels[status] ?? ''}`;
+      day.dataset.baseLabel = `${day.dataset.dayLabel}, ${statusLabels[status] ?? ''}`;
     });
     if (cal) {
       const monthsEls = [...cal.querySelectorAll<HTMLElement>('[data-cal-month]')];
@@ -775,7 +782,7 @@ const summaryTexts = {
       });
 
       // Summary
-      setText('menu', summary.menu?.name ?? '—');
+      setText('menu', summary.menu ? (menuNames[summary.menu.id] ?? summary.menu.name) : '—');
       setText('guests', fill(texts.guests, summary.guests as unknown as Record<string, number>));
       setText('date', summary.date ? formatLongDate(summary.date, LOCALE) : texts.dateNone);
       const city = summary.venue.city.trim();

@@ -4,7 +4,7 @@
 // «completo» = struck through + disabled, «pocas plazas» = dot, «tu fecha» = filled;
 // each day has its full aria-label.
 import { availability } from '../../data/availability';
-import { LOCALE } from '../../data/config';
+import { localeFor } from '../../data/config';
 import { getAvailabilityStatus } from '../../lib/reservation/availability';
 import { toIsoDate } from '../../lib/dates';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
@@ -15,16 +15,20 @@ interface Props {
 }
 
 const { selected } = Astro.props;
-const t = useTranslations(getLangFromUrl(Astro.url));
-const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const LOCALE = localeFor(lang);
+// Short weekday names, Monday first (5 Jan 2026 is a Monday)
+const weekdays = Array.from({ length: 7 }, (_, i) =>
+  cap(new Date(2026, 0, 5 + i).toLocaleDateString(LOCALE, { weekday: 'short' }).replace('.', '')),
+);
 
 // Base status from the shared logic. The rules that depend on «today» (past days,
 // lead time) are applied in the browser with the same function (getDayStatus).
 const months = availability.map((m) => {
   const first = new Date(m.year, m.month, 1);
   const length = new Date(m.year, m.month + 1, 0).getDate();
-  const monthName = first.toLocaleDateString(LOCALE, { month: 'long' });
   return {
     label: cap(first.toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' })).replace(
       ' de ',
@@ -34,7 +38,9 @@ const months = availability.map((m) => {
     days: Array.from({ length }, (_, i) => {
       const d = i + 1;
       const date = toIsoDate(m.year, m.month, d);
-      return { d, date, status: getAvailabilityStatus(date, availability) ?? 'available', monthName };
+      // «6 de noviembre», «6 November», «6 ноября»… (the language's own grammar)
+      const dayLabel = new Date(m.year, m.month, d).toLocaleDateString(LOCALE, { day: 'numeric', month: 'long' });
+      return { d, date, status: getAvailabilityStatus(date, availability) ?? 'available', dayLabel };
     }),
   };
 });
@@ -103,7 +109,7 @@ const statusLabels = JSON.stringify({
         ))}
         {month.days.map((day) => {
           const isSel = day.date === selected;
-          const base = `${day.d} de ${day.monthName}, ${statusText[day.status as keyof typeof statusText]}`;
+          const base = `${day.dayLabel}, ${statusText[day.status as keyof typeof statusText]}`;
           return (
             <button
               type="button"
@@ -112,8 +118,7 @@ const statusLabels = JSON.stringify({
               aria-pressed={isSel ? 'true' : 'false'}
               aria-label={isSel ? `${base}, ${t('booking.daySelected')}` : base}
               data-date={day.date}
-              data-day={day.d}
-              data-month-name={day.monthName}
+              data-day-label={day.dayLabel}
               data-base-label={base}
             >
               <span>{day.d}</span>

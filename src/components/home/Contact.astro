@@ -64,7 +64,7 @@ const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
         </div>
         <div class="field">
           <label for="c-fecha">{t('home.contact.date')}</label>
-          <input id="c-fecha" name="fecha" type="date" class="input" />
+          <input id="c-fecha" name="fecha" type="date" class="input date" data-date-picker />
         </div>
         <div class="field">
           <label for="c-inv">{t('home.contact.guests')}</label>
@@ -164,6 +164,19 @@ const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
     grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   }
 
+  .date {
+    cursor: pointer;
+  }
+
+  /* Calendar icon of the date field: larger and dark, easier to see and to tap */
+  .date::-webkit-calendar-picker-indicator {
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    cursor: pointer;
+    opacity: 0.85;
+  }
+
   .status {
     background: var(--mock-ok-bg);
     border-radius: 8px;
@@ -212,9 +225,26 @@ const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
 </style>
 
 <script>
+  import { todayIso } from '../../lib/dates';
+
   document.addEventListener('astro:page-load', () => {
     const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
     if (!form) return;
+
+    // Date: the browser's own calendar. It opens when clicking anywhere in the field
+    // (not only on the small icon) and past dates cannot be chosen.
+    const date = form.querySelector<HTMLInputElement>('[data-date-picker]');
+    if (date) {
+      date.min = todayIso();
+      date.addEventListener('click', () => {
+        try {
+          date.showPicker();
+        } catch {
+          // Browsers without showPicker(): the native behaviour remains
+        }
+      });
+    }
+
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const status = form.querySelector<HTMLElement>('[data-contact-status]');

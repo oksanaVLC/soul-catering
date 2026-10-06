@@ -6,12 +6,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/ui/PageHero.astro';
 import BlogCard from '../../components/ui/BlogCard.astro';
 import canapesRemolacha from '../../assets/images/canapes-remolacha.webp';
-import { blogCategories, featuredPost, posts } from '../../data/blog';
-import { LOCALE } from '../../data/config';
+import { blogCategories, getFeaturedPost, getPosts } from '../../data/blog';
+import { localeFor } from '../../data/config';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const LOCALE = localeFor(lang);
+const featuredPost = getFeaturedPost(t);
+const posts = getPosts(t);
 // Format from the design: «18 sept. 2026» (abbreviated month with a period).
 // The engine gives «18 sept 2026», so the period is added only when the month is abbreviated.
 const formatPostDate = (iso: string) => {
@@ -39,7 +42,7 @@ const featuredDate = featuredPost.date ? formatPostDate(featuredPost.date) : '';
               aria-pressed={i === 0 ? 'true' : 'false'}
               data-filter={cat}
             >
-              {cat}
+              {t(`blogCat.${cat}`)}
             </button>
           ))
         }
@@ -61,7 +64,7 @@ const featuredDate = featuredPost.date ? formatPostDate(featuredPost.date) : '';
           <div class="body">
             <p class="meta">
               <span class="gold">{t('blog.featured')}</span><span aria-hidden="true">·</span><span
-                >{featuredPost.category}</span
+                >{featuredPost.categoryLabel}</span
               >
             </p>
             <h2>{featuredPost.title}</h2>
@@ -265,7 +268,7 @@ const featuredDate = featuredPost.date ? formatPostDate(featuredPost.date) : '';
         chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
         let shown = 0;
         items.forEach((item) => {
-          const visible = cat === 'Todos' || item.dataset.cat === cat;
+          const visible = cat === 'all' || item.dataset.cat === cat;
           item.hidden = !visible;
           if (visible) shown++;
         });
