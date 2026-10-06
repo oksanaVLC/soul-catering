@@ -1,12 +1,15 @@
 ---
-// PROVISIONAL: the design has no specific mobile menu. The panel follows the
-// style of the header (paper background, same links and buttons) until a design exists.
 import { icon } from '@fortawesome/fontawesome-svg-core';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../ui/Button.astro';
 import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import { faInstagram, faLinkedinIn, faYoutube } from '@fortawesome/free-brands-svg-icons';
 
-export type NavItem = { href: string; label: string; current: boolean };
+export type NavItem = {
+  href: string;
+  label: string;
+  current: boolean;
+};
 
 interface Props {
   items: NavItem[];
@@ -15,8 +18,16 @@ interface Props {
 }
 
 const { items, bookHref, loginHref } = Astro.props;
-const t = useTranslations(getLangFromUrl(Astro.url));
-const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidden': 'true' } }).html.join('');
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const close = icon(faXmark, {
+  classes: ['icon-close'],
+  attributes: {
+    'aria-hidden': 'true',
+  },
+}).html.join('');
 ---
 
 <button
@@ -38,27 +49,54 @@ const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidde
     stroke="currentColor"
     stroke-width="1.8"
     stroke-linecap="round"
-    aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg
+    aria-hidden="true"
   >
+    <path d="M4 7h16M4 12h16M4 17h16"></path>
+  </svg>
+
   <Fragment set:html={close} />
 </button>
 
-<div id="mobile-menu" class="panel bg-base" hidden data-menu-panel>
-  <nav aria-label={t('nav.mobileLabel')} class="container">
+<div id="mobile-menu" class="mobile-panel bg-base" hidden data-menu-panel>
+  <nav class="container mobile-nav" aria-label={t('nav.mobileLabel')}>
     <ul>
-      {
-        items.map((item) => (
-          <li>
-            <a href={item.href} aria-current={item.current ? 'page' : undefined}>
-              {item.label}
-            </a>
-          </li>
-        ))
-      }
+      {items.map((item) => (
+        <li>
+          <a href={item.href} aria-current={item.current ? 'page' : undefined}>
+            {item.label}
+          </a>
+        </li>
+      ))}
     </ul>
+
     <div class="actions">
       <Button href={bookHref}>{t('nav.book')}</Button>
       <Button href={loginHref}>{t('nav.login')}</Button>
+    </div>
+    <div class="socials" aria-label="Social media">
+      <a href="#" aria-label="YouTube" class="social-link">
+        <Fragment
+          set:html={icon(faYoutube, {
+            attributes: { 'aria-hidden': 'true' },
+          }).html.join('')}
+        />
+      </a>
+
+      <a href="#" aria-label="LinkedIn" class="social-link">
+        <Fragment
+          set:html={icon(faLinkedinIn, {
+            attributes: { 'aria-hidden': 'true' },
+          }).html.join('')}
+        />
+      </a>
+
+      <a href="#" aria-label="Instagram" class="social-link">
+        <Fragment
+          set:html={icon(faInstagram, {
+            attributes: { 'aria-hidden': 'true' },
+          }).html.join('')}
+        />
+      </a>
     </div>
   </nav>
 </div>
@@ -66,20 +104,32 @@ const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidde
 <style>
   .menu-btn {
     display: none;
+    position: relative;
+    z-index: 2002;
+
     width: 52px;
     height: 52px;
-    border-radius: 50%;
+    padding: 0;
+
     border: 0;
-    background: none;
+    border-radius: 50%;
+
+    background: transparent;
     color: var(--ink);
+
     align-items: center;
     justify-content: center;
+
     cursor: pointer;
     flex: none;
   }
 
   .menu-btn:hover {
     background: rgba(20, 20, 20, 0.08);
+  }
+
+  .icon-open {
+    display: block;
   }
 
   .menu-btn :global(.icon-close) {
@@ -95,42 +145,62 @@ const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidde
     display: block;
   }
 
-  .panel {
-    position: absolute;
-    top: 100%;
-    left: 0;
+  /*
+       * The panel is a sibling of <header>.
+       * It therefore cannot cover the header/logo/language switcher.
+       */
+  .mobile-panel {
+    position: fixed;
+    z-index: 1999;
+
+    top: var(--header-h);
     right: 0;
-    border-bottom: 1px solid var(--line-header);
-    box-shadow: 0 18px 30px rgba(20, 20, 20, 0.08);
-    padding: 12px 0 32px;
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    min-height: calc(100dvh - var(--header-h));
+
+    padding: 20px 0 32px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
-  .panel[hidden] {
-    display: none;
+  .mobile-panel[hidden] {
+    display: none !important;
   }
 
-  ul {
+  .mobile-nav {
+    width: 100%;
+  }
+
+  .mobile-nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  li + li {
+  .mobile-nav li + li {
     border-top: 1px solid var(--line-header);
   }
 
-  ul a {
+  .mobile-nav > ul a {
     display: flex;
     align-items: center;
+
     min-height: 60px;
+
     color: var(--ink);
     text-decoration: none;
+
     font-size: 22px;
     font-weight: 600;
   }
 
-  ul a:hover,
-  ul a[aria-current] {
+  .mobile-nav > ul a:hover,
+  .mobile-nav > ul a[aria-current] {
     text-decoration: underline;
     text-underline-offset: 6px;
   }
@@ -149,47 +219,153 @@ const close = icon(faXmark, { classes: ['icon-close'], attributes: { 'aria-hidde
   }
 
   @media (min-width: 1181px) {
-    .panel {
+    .menu-btn,
+    .mobile-panel {
+      display: none !important;
+    }
+  }
+  .socials {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 56px;
+  }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 50%;
+
+    background: var(--ink);
+    color: var(--white);
+
+    text-decoration: none;
+
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .social-link:hover {
+    background: var(--ink-hover);
+    color: var(--white);
+    transform: translateY(-1px);
+  }
+
+  .social-link :global(.svg-inline--fa) {
+    width: 20px;
+    height: 20px;
+    color: currentColor;
+  }
+
+  @media (min-width: 1181px) {
+    .socials {
       display: none;
     }
   }
 </style>
 
 <script>
-  function setOpen(btn: HTMLButtonElement, panel: HTMLElement, open: boolean, returnFocus = false) {
-    btn.setAttribute('aria-expanded', String(open));
-    btn.setAttribute('aria-label', (open ? btn.dataset.labelClose : btn.dataset.labelOpen) ?? '');
-    panel.hidden = !open;
-    if (!open && returnFocus) btn.focus();
-  }
-
   function getParts() {
     const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
+
     const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
+
     return btn && panel ? { btn, panel } : null;
   }
 
-  // Document-level listeners: registered once, survive navigations.
-  document.addEventListener('keydown', (e) => {
+  function setOpen(btn: HTMLButtonElement, panel: HTMLElement, open: boolean, returnFocus = false) {
+    btn.setAttribute('aria-expanded', String(open));
+
+    btn.setAttribute(
+      'aria-label',
+      open ? (btn.dataset.labelClose ?? '') : (btn.dataset.labelOpen ?? ''),
+    );
+
+    panel.hidden = !open;
+
+    document.documentElement.classList.toggle('mobile-menu-open', open);
+
+    /*
+     * Lock both html and body.
+     */
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+    document.body.style.overflow = open ? 'hidden' : '';
+
+    if (!open && returnFocus) {
+      btn.focus();
+    }
+  }
+
+  function closeMenu(returnFocus = false) {
     const parts = getParts();
-    if (e.key === 'Escape' && parts && !parts.panel.hidden) {
-      setOpen(parts.btn, parts.panel, false, true);
+
+    if (!parts) return;
+
+    setOpen(parts.btn, parts.panel, false, returnFocus);
+  }
+
+  /*
+   * Open / close button and menu-link handling.
+   */
+  document.addEventListener('astro:page-load', () => {
+    const parts = getParts();
+
+    if (!parts) return;
+
+    const { btn, panel } = parts;
+
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+      setOpen(btn, panel, !isOpen);
+    });
+
+    panel.addEventListener('click', (event) => {
+      const target = event.target;
+
+      if (!(target instanceof Element)) return;
+
+      const link = target.closest('a');
+
+      if (link) {
+        setOpen(btn, panel, false);
+      }
+    });
+  });
+
+  /*
+   * Escape closes the menu.
+   */
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+
+    const parts = getParts();
+
+    if (!parts) return;
+
+    const isOpen = parts.btn.getAttribute('aria-expanded') === 'true';
+
+    if (isOpen) {
+      closeMenu(true);
     }
   });
 
-  window.matchMedia('(min-width: 1181px)').addEventListener('change', (mq) => {
-    const parts = getParts();
-    if (mq.matches && parts) setOpen(parts.btn, parts.panel, false);
-  });
+  /*
+   * If the viewport becomes desktop width,
+   * always close the mobile menu.
+   */
+  const desktopMedia = window.matchMedia('(min-width: 1181px)');
 
-  // Per-page listeners: the DOM changes with each navigation.
-  document.addEventListener('astro:page-load', () => {
-    const parts = getParts();
-    if (!parts) return;
-    const { btn, panel } = parts;
-    btn.addEventListener('click', () => setOpen(btn, panel, panel.hidden));
-    panel.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('a')) setOpen(btn, panel, false);
-    });
+  desktopMedia.addEventListener('change', (event) => {
+    if (event.matches) {
+      closeMenu();
+    }
   });
 </script>

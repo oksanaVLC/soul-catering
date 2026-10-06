@@ -1,6 +1,13 @@
 ---
 import Button from '../ui/Button.astro';
-import { getLangFromUrl, isPublished, languages, localizePath, switchLangPath, useTranslations } from '../../i18n/utils';
+import {
+  getLangFromUrl,
+  isPublished,
+  languages,
+  localizePath,
+  switchLangPath,
+  useTranslations,
+} from '../../i18n/utils';
 
 interface Props {
   /** full: Inicio (with newsletter). compact: Extras, Bodas, Blog, Reserva.
@@ -48,126 +55,69 @@ const columns = [
 ---
 
 {/* Pending link: same appearance as the design, no fake navigation */}
-{
-  variant === 'full' ? (
-    <footer class="foot full">
-      <div class="container stack">
-        <form class="news" data-newsletter>
-          <div class="news-text">
-            <h2 class="serif">{t('footer.newsTitle')}</h2>
-            <p>{t('footer.newsText')}</p>
-          </div>
-          <div class="news-fields">
-            <label for="n-email" class="sr-only">
-              {t('footer.newsEmail')}
-            </label>
-            <input
-              id="n-email"
-              name="email"
-              type="email"
-              class="input"
-              placeholder={t('footer.newsEmail')}
-              autocomplete="email"
-              required
-            />
-            <Button type="submit" variant="straw" data-label-done={t('footer.newsDone')}>
-              {t('footer.newsSubmit')}
-            </Button>
-          </div>
-          <p class="sr-only" role="status" data-newsletter-status />
-        </form>
-
-        <div class="cols">
-          <div class="brand">
-            <span class="logo-font">{t('site.name')}</span>
-            <p>
-              {t('footer.address')}
-              <br />
-              {t('footer.city')}
-              <br />
-              {t('footer.phone')}
-              <br />
-              {t('footer.email')}
-            </p>
-          </div>
-          {columns.map((col) => (
-            <nav aria-label={col.label} class="col">
-              <span class="col-title">{col.title}</span>
-              {col.links.map((l) =>
-                l.href ? (
-                  <a href={l.href}>{l.label}</a>
-                ) : (
-                  <span class="pending">
-                    {l.label} <span class="sr-only">{t('a11y.pending')}</span>
-                  </span>
-                ),
-              )}
-            </nav>
-          ))}
+{variant === 'full' ? (
+  <footer class="foot full">
+    <div class="container stack">
+      <form class="news" data-newsletter>
+        <div class="news-text">
+          <h2 class="serif">{t('footer.newsTitle')}</h2>
+          <p>{t('footer.newsText')}</p>
         </div>
+        <div class="news-fields">
+          <label for="n-email" class="sr-only">
+            {t('footer.newsEmail')}
+          </label>
+          <input
+            id="n-email"
+            name="email"
+            type="email"
+            class="input"
+            placeholder={t('footer.newsEmail')}
+            autocomplete="email"
+            required
+          />
+          <Button type="submit" variant="straw" data-label-done={t('footer.newsDone')}>
+            {t('footer.newsSubmit')}
+          </Button>
+        </div>
+        <p class="sr-only" role="status" data-newsletter-status />
+      </form>
 
-        <div class="bottom">
-          <span>{t('footer.copyright', { year })}</span>
-          <nav aria-label={t('lang.footerLabel')} class="langs">
-            {languages.map((code) =>
-
-              isPublished(code) ? (
-
-                <a
-
-                  href={switchLangPath(Astro.url.pathname, code)}
-
-                  lang={code}
-
-                  hreflang={code}
-
-                  aria-current={code === lang ? 'true' : undefined}
-
-                >
-
-                  {t(`lang.${code}`)}
-
-                </a>
-
+      <div class="cols">
+        <div class="brand">
+          <span class="logo-font">{t('site.name')}</span>
+          <p>
+            {t('footer.address')}
+            <br />
+            {t('footer.city')}
+            <br />
+            {t('footer.phone')}
+            <br />
+            {t('footer.email')}
+          </p>
+        </div>
+        {columns.map((col) => (
+          <nav aria-label={col.label} class="col">
+            <span class="col-title">{col.title}</span>
+            {col.links.map((l) =>
+              l.href ? (
+                <a href={l.href}>{l.label}</a>
               ) : (
-
-                <span class="pending" lang={code}>
-
-                  {t(`lang.${code}`)}
-
-                  <span class="sr-only" lang={lang}> {t('a11y.pending')}</span>
-
+                <span class="pending">
+                  {l.label} <span class="sr-only">{t('a11y.pending')}</span>
                 </span>
-
               ),
-
             )}
           </nav>
-        </div>
+        ))}
       </div>
-    </footer>
-  ) : (
-    <footer class="foot compact">
-      <div class="container row">
-        <span class="logo-font logo">{t('site.name')}</span>
-        <nav aria-label={t('footer.compactLabel')} class="links">
-          {compactLinks.map((l) =>
-            l.href ? (
-              <a href={l.href}>{l.label}</a>
-            ) : (
-              <span class="pending">
-                {l.label} <span class="sr-only">{t('a11y.pending')}</span>
-              </span>
-            ),
-          )}
-        </nav>
+
+      <div class="bottom">
+        <span>{t('footer.copyright', { year })}</span>
         <nav aria-label={t('lang.footerLabel')} class="langs">
           {languages.map((code) =>
-
             isPublished(code) ? (
-
               <a
-
                 href={switchLangPath(Astro.url.pathname, code)}
 
                 lang={code}
@@ -175,31 +125,68 @@ const columns = [
                 hreflang={code}
 
                 aria-current={code === lang ? 'true' : undefined}
-
               >
-
                 {t(`lang.${code}`)}
-
               </a>
-
             ) : (
-
               <span class="pending" lang={code}>
-
                 {t(`lang.${code}`)}
 
-                <span class="sr-only" lang={lang}> {t('a11y.pending')}</span>
-
+                <span class="sr-only" lang={lang}>
+                  {' '}
+                  {t('a11y.pending')}
+                </span>
               </span>
-
             ),
-
           )}
         </nav>
       </div>
-    </footer>
-  )
-}
+    </div>
+  </footer>
+) : (
+  <footer class="foot compact">
+    <div class="container row">
+      <span class="logo-font logo">{t('site.name')}</span>
+      <nav aria-label={t('footer.compactLabel')} class="links">
+        {compactLinks.map((l) =>
+          l.href ? (
+            <a href={l.href}>{l.label}</a>
+          ) : (
+            <span class="pending">
+              {l.label} <span class="sr-only">{t('a11y.pending')}</span>
+            </span>
+          ),
+        )}
+      </nav>
+      <nav aria-label={t('lang.footerLabel')} class="langs">
+        {languages.map((code) =>
+          isPublished(code) ? (
+            <a
+              href={switchLangPath(Astro.url.pathname, code)}
+
+              lang={code}
+
+              hreflang={code}
+
+              aria-current={code === lang ? 'true' : undefined}
+            >
+              {t(`lang.${code}`)}
+            </a>
+          ) : (
+            <span class="pending" lang={code}>
+              {t(`lang.${code}`)}
+
+              <span class="sr-only" lang={lang}>
+                {' '}
+                {t('a11y.pending')}
+              </span>
+            </span>
+          ),
+        )}
+      </nav>
+    </div>
+  </footer>
+)}
 
 <style>
   .foot {

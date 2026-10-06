@@ -1,5 +1,6 @@
 ---
 import { getLangFromUrl, localizePath, switchLangPath, useTranslations } from '../../i18n/utils';
+
 import Button from '../ui/Button.astro';
 import LangSwitcher from './LangSwitcher.astro';
 import MobileMenu, { type NavItem } from './MobileMenu.astro';
@@ -10,25 +11,53 @@ interface Props {
 }
 
 const { overlay = false } = Astro.props;
+
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
 const home = localizePath('/', lang);
-// Pathname without language prefix, to mark the active section
+
+/*
+ * Pathname without language prefix.
+ * Used to determine the active section.
+ */
 const path = switchLangPath(Astro.url.pathname, 'es');
+
 const isIn = (base: string) => path === base || path.startsWith(`${base}/`);
 
 const items: NavItem[] = [
-  { href: `${home}#servicios`, label: t('nav.services'), current: isIn('/servicios') },
-  { href: `${home}#sobre-nosotros`, label: t('nav.about'), current: false },
-  { href: localizePath('/extras', lang), label: t('nav.extras'), current: isIn('/extras') },
-  { href: localizePath('/blog', lang), label: t('nav.blog'), current: isIn('/blog') },
-  { href: `${home}#contacto`, label: t('nav.contact'), current: false },
+  {
+    href: `${home}#servicios`,
+    label: t('nav.services'),
+    current: isIn('/servicios'),
+  },
+  {
+    href: `${home}#sobre-nosotros`,
+    label: t('nav.about'),
+    current: false,
+  },
+  {
+    href: localizePath('/extras', lang),
+    label: t('nav.extras'),
+    current: isIn('/extras'),
+  },
+  {
+    href: localizePath('/blog', lang),
+    label: t('nav.blog'),
+    current: isIn('/blog'),
+  },
+  {
+    href: `${home}#contacto`,
+    label: t('nav.contact'),
+    current: false,
+  },
 ];
+
 const bookHref = localizePath('/reserva', lang);
 const loginHref = localizePath('/acceso', lang);
 ---
 
-<header class:list={['site-header bg-base', { overlay }]}>
+<header class:list={['site-header', 'bg-base', { overlay }]}>
   <div class="container bar">
     <a href={home} class="logo logo-font" aria-label={t('nav.home')}>
       {t('site.name')}
@@ -44,21 +73,33 @@ const loginHref = localizePath('/acceso', lang);
 
     <div class="tools">
       <LangSwitcher />
+
       <Button href={bookHref} size="sm" class="nav-desktop">
         {t('nav.book')}
       </Button>
+
       <Button href={loginHref} size="sm" class="nav-desktop">
         {t('nav.login')}
       </Button>
+
+      <!-- Button stays inside the header -->
       <MobileMenu items={items} bookHref={bookHref} loginHref={loginHref} />
     </div>
   </div>
 </header>
 
+<!--
+  IMPORTANT:
+  MobileMenu.astro renders the panel as a sibling of <header>,
+  not as a child of it.
+-->
 <style>
   .site-header {
     position: relative;
-    z-index: 20;
+    z-index: 2000;
+
+    width: 100%;
+
     border-bottom: 1px solid var(--line-header);
   }
 
@@ -69,22 +110,47 @@ const loginHref = localizePath('/acceso', lang);
     right: 0;
   }
 
+  /*
+   * When the mobile menu is open, the header becomes fixed.
+   *
+   * This is what keeps the logo, language switcher and X
+   * visible even if the user opened the menu after scrolling.
+   */
+  html.mobile-menu-open .site-header {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+
+    z-index: 2000;
+  }
+
   .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 20px;
+
     height: var(--header-h);
+
     flex-wrap: nowrap;
   }
 
   .logo {
     display: inline-flex;
     align-items: center;
+
     min-height: 44px;
+
     font-size: 30px;
+
     text-decoration: none;
     color: var(--ink);
+
     white-space: nowrap;
   }
 
@@ -98,9 +164,12 @@ const loginHref = localizePath('/acceso', lang);
   .navlink {
     color: var(--ink);
     text-decoration: none;
+
     font-size: 17px;
     font-weight: 600;
+
     padding: 10px 4px;
+
     white-space: nowrap;
   }
 
@@ -113,7 +182,9 @@ const loginHref = localizePath('/acceso', lang);
   .tools {
     display: flex;
     align-items: center;
+
     gap: 10px;
+
     flex: none;
   }
 
@@ -138,8 +209,6 @@ const loginHref = localizePath('/acceso', lang);
     }
   }
 
-  /* Very narrow screens (320–360px): the logo, language and menu must fit on one line
-     without being cut off (at 320px they needed 341px). */
   @media (max-width: 360px) {
     .bar {
       padding-left: 16px;
@@ -155,7 +224,6 @@ const loginHref = localizePath('/acceso', lang);
     }
   }
 
-  /* Folded phones (≈280px) */
   @media (max-width: 300px) {
     .bar {
       gap: 4px;
