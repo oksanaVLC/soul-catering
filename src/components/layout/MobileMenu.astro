@@ -212,13 +212,13 @@ const close = icon(faXmark, {
     margin-top: 20px;
   }
 
-  @media (max-width: 1180px) {
+  @media (max-width: 1259px) {
     .menu-btn {
       display: inline-flex;
     }
   }
 
-  @media (min-width: 1181px) {
+  @media (min-width: 1260px) {
     .menu-btn,
     .mobile-panel {
       display: none !important;
@@ -264,7 +264,7 @@ const close = icon(faXmark, {
     color: currentColor;
   }
 
-  @media (min-width: 1181px) {
+  @media (min-width: 1260px) {
     .socials {
       display: none;
     }
@@ -361,7 +361,7 @@ const close = icon(faXmark, {
    * If the viewport becomes desktop width,
    * always close the mobile menu.
    */
-  const desktopMedia = window.matchMedia('(min-width: 1181px)');
+  const desktopMedia = window.matchMedia('(min-width: 1260px)');
 
   desktopMedia.addEventListener('change', (event) => {
     if (event.matches) {

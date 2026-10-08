@@ -136,12 +136,12 @@ No añadas colores nuevos sin preguntar.
 - **Cabeceras de páginas internas** (`PageHero`): foto a todo el ancho con un degradado inferior que se funde con el color de la **sección siguiente** (prop `fadeTo`).
 
 ### Tipografía
-- Títulos: **Cormorant Garamond** 300/400/500/600 y cursivas 300/400 (`--font-serif`). Texto: **Lato** 400/700 (`--font-sans`; el 300 no se usa). No uses otras fuentes. Lato no tiene cirílico: detrás va **Carlito** (basada en Lato, solo subconjunto cirílico), así que la pila es `'Lato', 'Carlito', system-ui, sans-serif`.
+- Títulos: **Cormorant Garamond** 300/400/500/600 y cursivas 300/400 (`--font-serif`). Texto: **Lato** 400/700 (`--font-sans`; el 300 no se usa). Logo: **Casko Luxury** 400 (`--font-logo`: `'Casko Luxury', 'Cormorant Garamond', Georgia, serif`), solo para el logo; archivos en `public/fonts/` (woff2 + woff, sin el .ttf), `@font-face` en `global.css` y precargada (woff2) en `BaseLayout`. No uses otras fuentes. Lato no tiene cirílico: detrás va **Carlito** (basada en Lato, solo subconjunto cirílico), así que la pila es `'Lato', 'Carlito', system-ui, sans-serif`.
 - `body`: Lato 400, 19px, `line-height:1.75`, color `--text-v5`. Lead: 21px, `line-height:1.8`.
 - H1: Cormorant 300, `clamp(56px, 7.4vw, 108px)`, `line-height:1.02`. H2: Cormorant 300, `clamp(44px, 5vw, 68px)`, `line-height:1.1`. H3: Cormorant 500, 28–34px, `line-height:1.15`. Color de los titulares: `--ink-v5`.
 - `h1 em, h2 em`: cursiva 400 en `--bronze`. Los H2 de sección van en dos líneas: en i18n se separan con `|` y se pintan con `TwoLineTitle` (la segunda línea va en `<em>`).
 - Eyebrow: Lato 700, 14px, mayúsculas, `letter-spacing:.3em`, color `--bronze`, con una línea de 44×1px en `--gold-line` delante.
-- **Tamaño mínimo: 15px.** Únicas excepciones: etiquetas en mayúsculas con espaciado (eyebrow 14px, texto de botón v5 13–14px, «CATERING» del logo 11px, «DESCUBRE» 11px). El texto corrido nunca baja de 17px.
+- **Tamaño mínimo: 15px.** Únicas excepciones: etiquetas en mayúsculas con espaciado (eyebrow 14px, texto de botón v5 13–14px, «DESCUBRE» 11px). El texto corrido nunca baja de 17px.
 
 ### Layout
 - Contenedor `max-width:1240px`; padding lateral 40px (20px en móvil).
@@ -151,14 +151,14 @@ No añadas colores nuevos sin preguntar.
 ### Componentes
 - **Botones v5** (`Button` con `variant="v5-dark"` o `"v5-light"`): radio 2px, alto 58px, padding 0 38px, Lato 700 14px, mayúsculas, `letter-spacing:.22em`, borde 1px. Relleno que se desliza en hover (`::before` con `scaleX(0→1)`, `.55s var(--ease)`). `v5-dark`: fondo `--brown`, relleno `--brown-hover`. `v5-light`: fondo **blanco** (nunca transparente), texto `--brown`, borde `rgba(59,40,16,.45)`, relleno `--brown` y texto blanco. Tamaño pequeño (`size="sm"`): 46px, padding 0 24px, 13px. Foco: `outline` de 2px en `--gold-line`, offset 4px. Se usan en el hero, la cabecera y el menú móvil.
 - **Botones del estilo anterior** (`dark`, `light`, `straw`: píldora negra o blanca, 56px, 17–18px, nunca fondo transparente): siguen en el resto de secciones hasta que se decida cambiarlos.
-- **Logo**: apilado, «SOUL» (Cormorant 300, 32px, `letter-spacing:.16em`, `--bronze`) sobre «CATERING» (Lato 400, 11px, `letter-spacing:.42em`, `--text-v5`, 4px por debajo). Componente `Logo`, igual en la cabecera, Acceso, el panel y el pie (en el pie, `tone="light"`).
+- **Logo**: «Soul Catering» en una sola línea, Casko Luxury (`--font-logo`) 400, 29px, `letter-spacing:.02em`, `line-height:1.05`, `white-space:nowrap`, color `--bronze`; `aria-label` «Soul Catering, inicio» cuando es enlace. Componente `Logo`, igual en la cabecera, Acceso, el panel y el pie (en el pie, `tone="light"`, color `--foot-logo` #E6D3A8). En la cabecera de móvil (≤480px) baja a `clamp(22px, 6.2vw, 29px)` para que quepan el idioma y la hamburguesa.
 - **Cabecera** (igual en todas las páginas públicas): `fixed`, 96px, fondo `rgba(255,255,255,.82)` con `backdrop-filter: blur(10px)` y sombra `0 1px 0 rgba(138,104,48,.12)`. Tras 40px de scroll se añade `.is-solid` (fondo al 97 %). Contiene:
   - el logo;
-  - el menú Servicios · Nosotros · Extras · Blog · Contacto (Lato 15px, mayúsculas, `letter-spacing:.2em`, `--ink-v5`, separación de 34px, 22px por debajo de 1400px, con una línea en `--gold-line` que crece en hover);
+  - el menú Servicios · Nosotros · Extras · Blog · Contacto (Lato 15px, mayúsculas, `letter-spacing:.2em`, `--ink-v5`, separación de 30px, 22px por debajo de 1400px, con una línea en `--gold-line` que crece en hover);
   - el selector de idioma (globo + código + flecha, sin borde ni fondo; desplegable blanco con borde `--hairline` y radio 2px);
   - los botones **Reserva** y **Login** (`v5-dark` pequeños).
 
-  Todo en una sola línea. Por debajo de 1180px pasa a menú hamburguesa: `<button>` real con `aria-expanded` y `aria-controls`, se cierra con Esc y devuelve el foco al botón.
+  Todo en una sola línea (la barra de la cabecera usa `max-width:1380px`, más ancha que el contenedor). Por debajo de 1260px pasa a menú hamburguesa (es el ancho mínimo en que cabe en francés, el idioma más largo): `<button>` real con `aria-expanded` y `aria-controls`, se cierra con Esc y devuelve el foco al botón.
 - **Tarjeta de servicio**: radio 20px, imagen cuadrada arriba, cuerpo blanco con título, texto y enlace de texto «Descubrir →» (no botón).
 - **Sliders** (`Slider`): CSS `scroll-snap`, sin librerías. En pantallas grandes, rejilla con todas las tarjetas; en pantallas pequeñas, carrusel (en Plataforma, hasta 1280px). La cabecera de la sección va en el slot `head`. A su derecha, alineadas abajo con el título (debajo en móvil), van dos flechas cuadradas `.sq-arrow`: 58×58, radio 2px, borde `rgba(59,40,16,.45)`, fondo blanco, flecha fina de 22px; en hover, fondo `--brown` y flecha blanca; separación de 12px. Solo se muestran en modo carrusel. Los puntos indicadores van debajo de las tarjetas.
 - **Testimonios**: las mismas flechas, a ambos lados de los indicadores. Los indicadores son rayas de 2px (16px la inactiva, 36px la activa en `--gold-line`) con un área táctil de 44px.
@@ -244,7 +244,7 @@ Basado en mi otro proyecto, pero **solo con lo que necesita esta demo**:
 }
 ```
 
-Fuentes (ver §6): Cormorant Garamond (títulos), Lato (texto) y Carlito (solo el subconjunto cirílico, como respaldo de Lato en ruso; se declara con `@font-face` y `unicode-range` en `global.css`).
+Fuentes (ver §6): Cormorant Garamond (títulos), Lato (texto), Casko Luxury (solo el logo, archivos propios en `public/fonts/`) y Carlito (solo el subconjunto cirílico, como respaldo de Lato en ruso; se declara con `@font-face` y `unicode-range` en `global.css`).
 
 **No incluir**: `@astrojs/markdown-satteri`, `@fontsource/plus-jakarta-sans`, `@fontsource/rubik-dirt`, `@fontsource-variable/fraunces`, `@fontsource-variable/caveat`, `simple-icons`, `@fortawesome/free-regular-svg-icons` (salvo que haga falta un icono concreto), ni ningún adaptador, SDK de pagos, auth o email.
 Antes de instalar **cualquier** otro paquete, pregunta.

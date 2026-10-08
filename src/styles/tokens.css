@@ -70,6 +70,7 @@
   --foot-text: #e8e3d6;
   --foot-muted: #cfcbc1;
   --foot-heading: #e2cf94;
+  --foot-logo: #e6d3a8; /* logo on the dark footer */
   --foot-light: #f4f1ea;
 
   /* secondary texts (contrast to be checked in each phase where they are used) */
@@ -89,6 +90,7 @@
   /* ── Typography ── */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Lato', 'Carlito', system-ui, sans-serif; /* Carlito: Cyrillic only */
+  --font-logo: 'Casko Luxury', 'Cormorant Garamond', Georgia, serif;
 
   /* ── v5 colors (CAMBIOS-v5.md, authorized) ── */
   --brown: #3b2810; /* main button */

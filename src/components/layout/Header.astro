@@ -108,7 +108,9 @@ const loginHref = localizePath('/acceso', lang);
     background: rgba(255, 255, 255, 0.97);
   }
 
+  /* Wider than --container so the one-line logo + menu fit on one line */
   .bar {
+    max-width: 1380px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -119,7 +121,7 @@ const loginHref = localizePath('/acceso', lang);
 
   nav {
     display: flex;
-    gap: 34px;
+    gap: 30px;
     align-items: center;
     flex-wrap: nowrap;
   }
@@ -174,10 +176,26 @@ const loginHref = localizePath('/acceso', lang);
     }
   }
 
-  @media (max-width: 1180px) {
+  @media (max-width: 1259px) {
     .nav-desktop,
     .tools :global(.nav-desktop) {
       display: none;
+    }
+  }
+
+  /* Phones: the one-line logo scales down (29px from 468px up) so the language
+     switcher and the menu button still fit next to it */
+  @media (max-width: 480px) {
+    .bar {
+      gap: 12px;
+    }
+
+    .bar > :global(.logo) {
+      font-size: clamp(22px, 6.2vw, 29px);
+    }
+
+    .tools {
+      gap: 0;
     }
   }
 

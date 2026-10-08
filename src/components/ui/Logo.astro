@@ -1,6 +1,6 @@
 ---
-// Stacked logo «SOUL / CATERING» (CAMBIOS-v5 §2), the same on every page.
-// tone="light": light colors for dark backgrounds (footer).
+// One-line logo «Soul Catering» in Casko Luxury, the same on every page.
+// tone="light": light color for dark backgrounds (footer).
 import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
 
 interface Props {
@@ -18,43 +18,25 @@ const Tag = link ? 'a' : 'span';
 
 <Tag
   href={link ? localizePath('/', lang) : undefined}
-  class:list={['logo-stack', `tone-${tone}`, extra]}
+  class:list={['logo', `tone-${tone}`, extra]}
   aria-label={link ? t('nav.home') : undefined}
 >
-  <span class="soul" aria-hidden={link ? 'true' : undefined}>SOUL</span>
-  <span class="catering" aria-hidden={link ? 'true' : undefined}>CATERING</span>
+  <span aria-hidden={link ? 'true' : undefined}>Soul Catering</span>
 </Tag>
 
 <style>
-  .logo-stack {
+  .logo {
     display: inline-flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    align-items: center;
     min-height: 44px;
-    text-decoration: none;
-    line-height: 1;
+    font: 400 29px/1.05 var(--font-logo);
+    letter-spacing: 0.02em;
     white-space: nowrap;
-  }
-
-  .soul {
-    font: 300 32px/1 var(--font-serif);
-    letter-spacing: 0.16em;
     color: var(--bronze);
+    text-decoration: none;
   }
 
-  .catering {
-    margin-top: 4px;
-    font: 400 11px/1 var(--font-sans);
-    letter-spacing: 0.42em;
-    color: var(--text-v5);
-  }
-
-  .tone-light .soul {
-    color: var(--foot-heading);
-  }
-
-  .tone-light .catering {
-    color: var(--foot-text);
+  .tone-light {
+    color: var(--foot-logo);
   }
 </style>
