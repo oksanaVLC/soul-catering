@@ -13,7 +13,7 @@ const homeExtras = getExtras(t).slice(0, HOME_EXTRAS_COUNT);
 
 <section id="extras" class="bg-white section" aria-labelledby="extras-title">
   <Slider prevLabel={t('home.extras.prev')} nextLabel={t('home.extras.next')} cols={4}>
-    <div slot="head" class="head">
+    <div slot="head" class="head" data-reveal="left">
       <p class="eyebrow">{t('home.extras.eyebrow')}</p>
       <h2 id="extras-title"><TwoLineTitle text={t('home.extras.title')} /></h2>
       <p class="lead">{t('home.extras.text')}</p>

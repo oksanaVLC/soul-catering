@@ -11,7 +11,7 @@ const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
 
 <section id="contacto" class="silver section" aria-labelledby="contacto-title">
   <div class="container wrap">
-    <div class="info">
+    <div class="info" data-reveal="left">
       <p class="eyebrow">{t('home.contact.eyebrow')}</p>
       <h2 id="contacto-title"><TwoLineTitle text={t('home.contact.title')} /></h2>
       <p class="lead">{t('home.contact.text')}</p>
@@ -37,7 +37,7 @@ const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
       </div>
     </div>
 
-    <form class="form" data-contact-form>
+    <form class="form" data-contact-form data-reveal="right" data-reveal-delay="1">
       <div class="status" role="status" data-contact-status hidden>
         <strong>{t('home.contact.sentStrong')}</strong>
         {t('home.contact.sentText')}

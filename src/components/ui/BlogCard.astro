@@ -8,9 +8,11 @@ interface Props {
   post: Post;
   /** teaser: Inicio block (no summary). list: /blog grid (with summary). */
   variant?: 'teaser' | 'list';
+  /** Scroll reveal (data-reveal="up") with this delay per column: 0–3. */
+  revealDelay?: number;
 }
 
-const { post, variant = 'list' } = Astro.props;
+const { post, variant = 'list', revealDelay } = Astro.props;
 const t = useTranslations(getLangFromUrl(Astro.url));
 const minutes =
   variant === 'teaser'
@@ -18,7 +20,13 @@ const minutes =
     : t('common.minutes', { min: post.minutes });
 ---
 
-<article class:list={['post', variant]} data-cat={post.category} data-slug={post.slug}>
+<article
+  class:list={['post', variant]}
+  data-cat={post.category}
+  data-slug={post.slug}
+  data-reveal={revealDelay !== undefined ? 'up' : undefined}
+  data-reveal-delay={revealDelay || undefined}
+>
   <div class="img">
     <Image
       src={post.image}
@@ -53,6 +61,11 @@ const minutes =
     height: auto;
     aspect-ratio: 3 / 2;
     object-fit: cover;
+    transition: transform 1.1s var(--ease);
+  }
+
+  .post:hover .img :global(img) {
+    transform: scale(1.05);
   }
 
   .meta {

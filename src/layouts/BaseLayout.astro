@@ -62,6 +62,12 @@ const textureVars = `--tex-silver: url("${silver.src}");`;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- .js: the scroll reveal only hides content when JavaScript runs. ClientRouter replaces
+         the <html> attributes on each navigation, so the class is added again after the swap. -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      document.addEventListener('astro:after-swap', () => document.documentElement.classList.add('js'));
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
@@ -102,5 +108,8 @@ const textureVars = `--tex-silver: url("${silver.src}");`;
       <slot />
     )}
     {footer !== 'none' && <Footer variant={footer} />}
+    <script>
+      import '../scripts/reveal';
+    </script>
   </body>
 </html>

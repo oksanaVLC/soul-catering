@@ -21,7 +21,7 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
   <!-- Section header (slot "head") with the arrows on the right, aligned to the bottom of the title -->
   <div class="container slider-head">
     <div class="head-text"><slot name="head" /></div>
-    <div class="arrows">
+    <div class="arrows" data-reveal="right" data-reveal-delay="1">
       <button type="button" class="sq-arrow" aria-label={prevLabel} data-slider-prev>
         <svg
           width="22"
@@ -50,7 +50,7 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
       </button>
     </div>
   </div>
-  <ul class="track" data-slider-track>
+  <ul class="track" data-slider-track data-reveal="up">
     <slot />
   </ul>
   <!-- Visual indicator only: the arrows and swiping are the controls -->

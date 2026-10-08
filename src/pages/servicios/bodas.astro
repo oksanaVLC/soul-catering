@@ -95,14 +95,14 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
   <!-- Moments of the day -->
   <section class="block" aria-labelledby="momentos-title">
     <div class="container stack">
-      <div class="head">
+      <div class="head" data-reveal="left">
         <p class="eyebrow">{t('bodas.momentsEyebrow')}</p>
         <h2 id="momentos-title"><TwoLineTitle text={t('bodas.momentsTitle')} /></h2>
       </div>
       <div class="moments">
         {
-          moments.map((m) => (
-            <article>
+          moments.map((m, i) => (
+            <article data-reveal="up" data-reveal-delay={i % 3 || undefined}>
               <Image
                 src={m.image}
                 alt={t(`bodas.m${m.n}Alt`)}
@@ -122,7 +122,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
   <!-- Example menu -->
   <section id="menu" class="bg-base block" aria-labelledby="menu-title">
     <div class="container menu-grid">
-      <div class="menu-intro">
+      <div class="menu-intro" data-reveal="left">
         <p class="eyebrow">{t('bodas.menuEyebrow')}</p>
         <h2 id="menu-title"><TwoLineTitle text={t('bodas.menuTitle')} /></h2>
         <p class="lead">{t('bodas.menuLead')}</p>
@@ -135,7 +135,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
           class="menu-photo"
         />
       </div>
-      <div class="menu-card">
+      <div class="menu-card" data-reveal="right" data-reveal-delay="1">
         <div class="menu-top">
           <h3>{t('bodas.menuName')}</h3>
           <span class="menu-price">{t('bodas.menuPrice')}</span>
@@ -169,11 +169,11 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
   <!-- Additional services -->
   <section class="block white" aria-labelledby="adicionales-title">
     <div class="container stack">
-      <div class="head">
+      <div class="head" data-reveal="left">
         <p class="eyebrow">{t('bodas.extrasEyebrow')}</p>
         <h2 id="adicionales-title"><TwoLineTitle text={t('bodas.extrasTitle')} /></h2>
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap" data-reveal="up">
         <table>
           <thead>
             <tr>
@@ -199,14 +199,14 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
   <!-- Wedding process (not the booking flow) -->
   <section class="block" aria-labelledby="proceso-title">
     <div class="container stack">
-      <div class="head">
+      <div class="head" data-reveal="left">
         <p class="eyebrow">{t('bodas.processEyebrow')}</p>
         <h2 id="proceso-title"><TwoLineTitle text={t('bodas.processTitle')} /></h2>
       </div>
       <ol class="process">
         {
           process.map(([title, text], i) => (
-            <li>
+            <li data-reveal="up" data-reveal-delay={i % 4 || undefined}>
               <span class="step-n">{t('bodas.processStep', { n: i + 1 })}</span>
               <h3>{title}</h3>
               <p>{text}</p>
@@ -220,7 +220,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
   <!-- FAQ -->
   <section class="block white faq" aria-labelledby="faq-bodas-title">
     <div class="container faq-grid">
-      <div class="head">
+      <div class="head" data-reveal="left">
         <p class="eyebrow">{t('bodas.faqEyebrow')}</p>
         <h2 id="faq-bodas-title"><TwoLineTitle text={t('bodas.faqTitle')} /></h2>
       </div>
@@ -230,7 +230,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
 
   <!-- CTA -->
   <section class="bg-base block cta" aria-labelledby="cta-title">
-    <div class="container cta-inner">
+    <div class="container cta-inner" data-reveal="up">
       <h2 id="cta-title"><TwoLineTitle text={t('bodas.ctaTitle')} /></h2>
       <p class="lead">{t('bodas.ctaText')}</p>
       <Button href={bookHref}>{t('bodas.ctaButton')}</Button>

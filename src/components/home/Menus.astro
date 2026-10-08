@@ -20,7 +20,7 @@ const price = (cents: number) => t('booking.perPerson', { price: formatAmount(ce
 <!-- DEMO: example dishes and prices («Precios de ejemplo»). -->
 <section id="menus" class="bg-base section" aria-labelledby="menus-title">
   <Slider prevLabel={t('home.menus.prev')} nextLabel={t('home.menus.next')} cols={3}>
-    <div slot="head" class="head">
+    <div slot="head" class="head" data-reveal="left">
       <p class="eyebrow">{t('home.menus.eyebrow')}</p>
       <h2 id="menus-title"><TwoLineTitle text={t('home.menus.title')} /></h2>
       <p class="lead">{t('home.menus.text')}</p>
@@ -153,6 +153,11 @@ const price = (cents: number) => t('booking.perPerson', { price: formatAmount(ce
     height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
+    transition: transform 1.1s var(--ease);
+  }
+
+  .mcard:hover :global(img) {
+    transform: scale(1.05);
   }
 
   .mcard-body {

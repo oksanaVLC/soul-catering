@@ -10,7 +10,7 @@ const facts = [1, 2, 3] as const;
 
 <!-- DEMO: «Nosotros» texts are example text (visible notice from the design). -->
 <section id="sobre-nosotros" class="bg-cream section" aria-labelledby="nosotros-title">
-  <div class="container photo-wrap">
+  <div class="container photo-wrap" data-reveal="up">
     <Image
       src={cocineros}
       alt={t('home.about.alt')}
@@ -21,15 +21,15 @@ const facts = [1, 2, 3] as const;
     />
   </div>
   <div class="container inner">
-    <p class="eyebrow">{t('home.about.eyebrow')}</p>
-    <h2 id="nosotros-title"><TwoLineTitle text={t('home.about.title')} /></h2>
-    <div class="cols">
+    <p class="eyebrow" data-reveal="left">{t('home.about.eyebrow')}</p>
+    <h2 id="nosotros-title" data-reveal="left"><TwoLineTitle text={t('home.about.title')} /></h2>
+    <div class="cols" data-reveal="up">
       <p class="lead">{t('home.about.p1')}</p>
       <p class="lead">{t('home.about.p2')}</p>
       <p class="lead">{t('home.about.p3')}</p>
       <p class="lead">{t('home.about.p4')}</p>
     </div>
-    <ul class="facts">
+    <ul class="facts" data-reveal="up" data-reveal-delay="1">
       {facts.map((n) => (
         <li>
           <strong>{t(`home.about.f${n}Title`)}</strong>

@@ -94,11 +94,11 @@ const t = useTranslations(getLangFromUrl(Astro.url));
     aspect-ratio: 1 / 1;
     object-fit: cover;
     filter: saturate(0.85);
-    transition: transform 0.7s ease;
+    transition: transform 1.1s var(--ease);
   }
 
   .scard:hover .scard-img :global(img) {
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
 
   .scard-body {
@@ -135,9 +135,24 @@ const t = useTranslations(getLangFromUrl(Astro.url));
     transition: transform 0.25s ease;
   }
 
-  .scard-link[href]:hover {
-    text-decoration: underline;
-    text-underline-offset: 6px;
+  /* Gold line that grows from 28px to the full width on hover */
+  .scard-link[href] {
+    position: relative;
+  }
+
+  .scard-link[href]::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 4px;
+    width: 28px;
+    height: 1px;
+    background: var(--gold-line);
+    transition: width 0.5s var(--ease);
+  }
+
+  .scard-link[href]:hover::after {
+    width: 100%;
   }
 
   .scard-link[href]:hover svg {

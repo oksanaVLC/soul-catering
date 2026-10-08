@@ -13,14 +13,14 @@ const homePosts = getHomePosts(t);
 <section class="bg-white section" aria-labelledby="blog-title">
   <div class="container inner">
     <div class="head">
-      <div class="titles">
+      <div class="titles" data-reveal="left">
         <p class="eyebrow">{t('home.blog.eyebrow')}</p>
         <h2 id="blog-title"><TwoLineTitle text={t('home.blog.title')} /></h2>
       </div>
-      <Button href={localizePath('/blog', lang)} variant="light">{t('home.blog.cta')}</Button>
+      <Button href={localizePath('/blog', lang)} variant="light" data-reveal="right" data-reveal-delay="1">{t('home.blog.cta')}</Button>
     </div>
     <div class="grid">
-      {homePosts.map((post) => <BlogCard post={post} variant="teaser" />)}
+      {homePosts.map((post, i) => <BlogCard post={post} variant="teaser" revealDelay={i % 3} />)}
     </div>
   </div>
 </section>

@@ -7,6 +7,16 @@ const t = useTranslations(lang);
 
 // Title in two lines: «|» separates the plain line from the italic one.
 const [titleLine1, titleLine2 = ''] = t('home.hero.title').split('|');
+
+// Letter-by-letter entrance: one span per letter (growing delay of 0.045s from 0.35s),
+// grouped in one nowrap span per word so words never break.
+let letterIndex = 0;
+const toWords = (line: string) =>
+  line.split(' ').map((word) =>
+    [...word].map((char) => ({ char, delay: (0.35 + letterIndex++ * 0.045).toFixed(3) })),
+  );
+const titleWords1 = toWords(titleLine1);
+const titleWords2 = toWords(titleLine2);
 ---
 
 <section class="hero" aria-label={t('home.hero.label')}>
@@ -31,10 +41,28 @@ const [titleLine1, titleLine2 = ''] = t('home.hero.title').split('|');
   <div class="veil" aria-hidden="true"></div>
   <div class="container content">
     <p class="eyebrow"><span>{t('home.hero.eyebrow')}</span></p>
-    <h1>
-      <span class="line1">{titleLine1}</span>
+    <h1 aria-label={`${titleLine1} ${titleLine2}`}>
+      <span aria-hidden="true">
+        {titleWords1.map((word, i) => (
+          <>
+            {i > 0 && ' '}
+            <span class="word">
+              {word.map((l) => <span class="wave" style={`animation-delay:${l.delay}s`}>{l.char}</span>)}
+            </span>
+          </>
+        ))}
+      </span>
       <br />
-      <em>{titleLine2}</em>
+      <em aria-hidden="true">
+        {titleWords2.map((word, i) => (
+          <>
+            {i > 0 && ' '}
+            <span class="word">
+              {word.map((l) => <span class="wave" style={`animation-delay:${l.delay}s`}>{l.char}</span>)}
+            </span>
+          </>
+        ))}
+      </em>
     </h1>
     <p class="text">{t('home.hero.text')}</p>
     <div class="ctas">
@@ -211,6 +239,127 @@ const [titleLine1, titleLine2 = ''] = t('home.hero.title').split('|');
     .ctas :global(.btn-v5) {
       width: 100%;
       padding: 0 20px;
+    }
+  }
+
+  /* ── Entrance on load (not on scroll) ── */
+  .hero-video {
+    animation: hero-video-in 1.6s var(--ease) both;
+  }
+
+  .eyebrow {
+    animation: hero-drop 0.8s var(--ease) 0.1s both;
+  }
+
+  .word {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .wave {
+    display: inline-block;
+    animation: hero-wave 0.9s var(--ease) both;
+  }
+
+  .text {
+    animation: hero-rise 0.9s var(--ease) 1.15s both;
+  }
+
+  .ctas {
+    animation: hero-rise 0.9s var(--ease) 1.35s both;
+  }
+
+  .scroll-cue {
+    animation: hero-fade 0.8s var(--ease) 1.9s both;
+  }
+
+  /* The line «drips»: grows from the top, then shrinks towards the bottom */
+  .cue-line {
+    animation: hero-drip 2.4s var(--ease) 1.9s infinite;
+  }
+
+  @keyframes hero-video-in {
+    from {
+      opacity: 0;
+      transform: scale(1.04);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-drop {
+    from {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-wave {
+    from {
+      opacity: 0;
+      transform: translateY(0.55em) rotate(4deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes hero-drip {
+    0% {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    50.01% {
+      transform: scaleY(1);
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+  }
+
+  /* Everything still and visible from the start */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video,
+    .eyebrow,
+    .wave,
+    .text,
+    .ctas,
+    .scroll-cue,
+    .cue-line {
+      animation: none !important;
     }
   }
 

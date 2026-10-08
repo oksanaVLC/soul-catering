@@ -85,7 +85,7 @@ const featuredDate = featuredPost.date ? formatPostDate(featuredPost.date) : '';
     <section class="list" aria-label={t('blog.title')}>
       <div class="container stack">
         <div class="grid">
-          {posts.map((post) => <BlogCard post={post} variant="list" />)}
+          {posts.map((post, i) => <BlogCard post={post} variant="list" revealDelay={i % 3} />)}
         </div>
         <p class="empty" hidden data-empty>{t('blog.empty')}</p>
         <nav aria-label={t('blog.pagination')} class="pages">
@@ -141,6 +141,14 @@ const featuredDate = featuredPost.date ? formatPostDate(featuredPost.date) : '';
   .featured .img {
     overflow: hidden;
     border-radius: 6px;
+  }
+
+  .featured .img :global(img) {
+    transition: transform 1.1s var(--ease);
+  }
+
+  .featured:hover .img :global(img) {
+    transform: scale(1.05);
   }
 
   .featured :global(img) {

@@ -11,16 +11,23 @@ interface Props {
   index: number;
   /** slide: <li> of the Inicio slider. grid: <article> of /extras (with price and button in the slot). */
   variant?: 'slide' | 'grid';
+  /** Scroll reveal (data-reveal="up") with this delay per column: 0–3. Grid only. */
+  revealDelay?: number;
 }
 
-const { extra, index, variant = 'slide' } = Astro.props;
+const { extra, index, variant = 'slide', revealDelay } = Astro.props;
 const t = useTranslations(getLangFromUrl(Astro.url));
 const Tag = variant === 'slide' ? 'li' : 'article';
 const Heading = variant === 'slide' ? 'h3' : 'h2';
 const placeholder = ['ph-dark', 'ph-straw', 'ph-grey'][index % 3];
 ---
 
-<Tag class:list={['excard', variant]} data-cat={extra.cat}>
+<Tag
+  class:list={['excard', variant]}
+  data-cat={extra.cat}
+  data-reveal={revealDelay !== undefined ? 'up' : undefined}
+  data-reveal-delay={revealDelay || undefined}
+>
   {
     extra.image ? (
       <div class="ph">
@@ -86,11 +93,11 @@ const placeholder = ['ph-dark', 'ph-straw', 'ph-grey'][index % 3];
   }
 
   .slide .ph :global(img) {
-    transition: transform 0.7s ease;
+    transition: transform 1.1s var(--ease);
   }
 
   .slide:hover .ph :global(img) {
-    transform: scale(1.04);
+    transform: scale(1.05);
   }
 
   .ph-box {

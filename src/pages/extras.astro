@@ -47,7 +47,7 @@ const initialCount = extrasInitiallySelected.length;
             extras.map((extra, i) => {
               const on = extrasInitiallySelected.includes(extra.id);
               return (
-                <ExtraCard extra={extra} index={i} variant="grid">
+                <ExtraCard extra={extra} index={i} variant="grid" revealDelay={i % 4}>
                   <p class="price">{t('extras.priceFrom')}</p>
                   <button
                     type="button"

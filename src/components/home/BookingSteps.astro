@@ -19,13 +19,14 @@ const steps = [1, 2, 3, 4, 5, 6] as const;
     sizes="(max-width: 1080px) 100vw, 50vw"
     loading="lazy"
     class="photo"
+    data-reveal="left"
   />
   <div class="body">
-    <div class="head">
+    <div class="head" data-reveal="left">
       <p class="eyebrow">{t('home.steps.eyebrow')}</p>
       <h2 id="pasos-title"><TwoLineTitle text={t('home.steps.title')} /></h2>
     </div>
-    <ol>
+    <ol data-reveal="up" data-reveal-delay="1">
       {
         steps.map((n) => (
           <li>

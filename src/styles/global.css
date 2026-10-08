@@ -498,14 +498,20 @@ details.faq summary::-webkit-details-marker {
   display: none;
 }
 
+/* «+» made of thin lines in --bronze; turns 45° (×) when open: shape, not just colour */
 details.faq summary::after {
-  content: '+';
-  font-size: 32px;
-  font-weight: 400;
+  content: '';
+  flex: none;
+  width: 22px;
+  height: 22px;
+  background:
+    linear-gradient(var(--bronze), var(--bronze)) center / 100% 1.5px no-repeat,
+    linear-gradient(var(--bronze), var(--bronze)) center / 1.5px 100% no-repeat;
+  transition: transform 0.4s var(--ease);
 }
 
 details.faq[open] summary::after {
-  content: '\2013';
+  transform: rotate(45deg);
 }
 
 details.faq p {
@@ -581,6 +587,55 @@ a.is-pending {
   width: auto;
   overflow: visible;
   flex: none;
+}
+
+/* ── Scroll reveal (CAMBIOS-v5 §1, src/scripts/reveal.ts) ── */
+/* Elements waiting to enter from the sides (±70px) must not create horizontal scroll.
+   (body's overflow-x is passed to the viewport and does not prevent it; clip on <main>
+   does, and unlike hidden it keeps position: sticky working.) */
+main {
+  overflow-x: clip;
+}
+
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(50px);
+  transition:
+    opacity 0.85s var(--ease),
+    transform 0.85s var(--ease);
+}
+
+html.js [data-reveal='left'] {
+  transform: translateX(-70px);
+}
+
+html.js [data-reveal='right'] {
+  transform: translateX(70px);
+}
+
+html.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+html.js [data-reveal-delay='1'] {
+  transition-delay: 0.12s;
+}
+
+html.js [data-reveal-delay='2'] {
+  transition-delay: 0.24s;
+}
+
+html.js [data-reveal-delay='3'] {
+  transition-delay: 0.36s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 /* ── Reduced motion ── */
