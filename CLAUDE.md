@@ -98,61 +98,105 @@ En toda la web los pasos son **estos seis y en este orden**:
 
 ## 6. Sistema de diseño
 
+> Actualizado con **CAMBIOS-v5** (octubre 2026). Si algo de `design/` choca con esta sección, manda esta sección.
+
 ### Colores (`src/styles/tokens.css`)
+Base (se siguen usando):
 ```css
---bg: #F6F2E9;          /* fondo general */
---bg-header: #FBF8F2;   /* cabecera */
+--bg: #F6F2E9;          /* fondo general de las páginas */
 --surface: #FFFDF8;     /* tarjetas */
 --white: #FFFFFF;
---ink: #141414;         /* títulos, botones, pie */
---text: #2B2B28;
---text-2: #3A3934;
---muted: #55554F;       /* mínimo para texto */
---gold: #6E5A1E;        /* etiquetas (eyebrow) */
---accent: #B8963E;      /* detalles, foco */
---straw: #E9DCB8;
---line: #DAD6CC;
+--ink: #141414;         /* pie y botones del estilo anterior */
+--text: #2B2B28;  --text-2: #3A3934;  --muted: #55554F;
+--gold: #6E5A1E;  --accent: #B8963E;  --straw: #E9DCB8;  --line: #DAD6CC;
 --silver-base: #EDEDEC;
---hero-text: #3A2418;
 /* estados */
 --ok-bg: #E3EBDD;    --ok: #2F4A26;
 --wait-bg: #F6EAD3;  --wait: #6E4B12;
 --allergen-bg: #F3EADB; --allergen: #5B4422;
 ```
+v5 (autorizados):
+```css
+--brown: #3B2810;        /* botón principal v5 */
+--brown-hover: #1E1A16;
+--bronze: #7A5A22;       /* eyebrows, números, cursivas de títulos — 6:1 sobre blanco */
+--gold-line: #C9A96E;    /* SOLO líneas decorativas, nunca texto sobre fondo claro */
+--ink-v5: #1E1A16;       /* titulares, menú */
+--text-v5: #4A4033;      /* párrafos — 9,6:1 sobre blanco */
+--ivory: #F4F0EA;  --cream: #FAF7F2;   /* fondos neutros */
+--hairline: rgba(138,104,48,.22);
+--hero-ink: #2A1C10;  --hero-accent: #5E4418;  --hero-eyebrow: #5A4216;
+--ease: cubic-bezier(.22,1,.36,1);
+```
 No añadas colores nuevos sin preguntar.
 
-### Texturas (en `src/assets/images/`)
-- **Papel beige**: cabecera, Nuestros servicios, Nosotros, Servicios extra, Blog, FAQ y la mitad del formulario de Acceso. Opacidad 100 %.
-- **Gris de luces y sombras**: Reserva online (pasos), La plataforma, Testimonios y Contacto. Imagen al **55 %** sobre `--silver-base`.
-- Se aplican con `::before` absoluto y `z-index:-1`, siempre por debajo del texto.
+### Fondos
+- **Sin textura de papel** (eliminada). Colores lisos con las clases `.bg-ivory`, `.bg-cream`, `.bg-white` y `.bg-base` (`--bg`): Nuestros servicios `--ivory` · Nosotros `--cream` · Servicios extra `#FFF` · Blog `#FFF` · FAQ `--cream` · mitad del formulario de Acceso `--cream` · Menús `--cream` · resto de páginas `--bg`.
+- **Textura gris de luces y sombras** (clase `.silver`): imagen al **55 %** sobre `--silver-base`, con `::before` y `z-index:-1`, en Reserva online (pasos), La plataforma, Testimonios y Contacto. No se sustituye por color liso.
+- **Cabeceras de páginas internas** (`PageHero`): foto a todo el ancho con un degradado inferior que se funde con el color de la **sección siguiente** (prop `fadeTo`).
 
 ### Tipografía
-- Títulos: **Cormorant Garamond 600**. Texto: **Plus Jakarta Sans 400/500/600/700**. No uses otras fuentes.
-- Texto base 19px, interlineado 1.65; lead 21px; **nunca menos de 15px**.
-- H1 `clamp(50px, 6vw, 88px)`; H2 `clamp(40px, 4.6vw, 62px)`; eyebrow 15px en mayúsculas, `letter-spacing:.16em`, color `--gold`.
+- Títulos: **Cormorant Garamond** 300/400/500/600 y cursivas 300/400 (`--font-serif`). Texto: **Lato** 400/700 (`--font-sans`; el 300 no se usa). No uses otras fuentes. Lato no tiene cirílico: detrás va **Carlito** (basada en Lato, solo subconjunto cirílico), así que la pila es `'Lato', 'Carlito', system-ui, sans-serif`.
+- `body`: Lato 400, 19px, `line-height:1.75`, color `--text-v5`. Lead: 21px, `line-height:1.8`.
+- H1: Cormorant 300, `clamp(56px, 7.4vw, 108px)`, `line-height:1.02`. H2: Cormorant 300, `clamp(44px, 5vw, 68px)`, `line-height:1.1`. H3: Cormorant 500, 28–34px, `line-height:1.15`. Color de los titulares: `--ink-v5`.
+- `h1 em, h2 em`: cursiva 400 en `--bronze`. Los H2 de sección van en dos líneas: en i18n se separan con `|` y se pintan con `TwoLineTitle` (la segunda línea va en `<em>`).
+- Eyebrow: Lato 700, 14px, mayúsculas, `letter-spacing:.3em`, color `--bronze`, con una línea de 44×1px en `--gold-line` delante.
+- **Tamaño mínimo: 15px.** Únicas excepciones: etiquetas en mayúsculas con espaciado (eyebrow 14px, texto de botón v5 13–14px, «CATERING» del logo 11px, «DESCUBRE» 11px). El texto corrido nunca baja de 17px.
 
 ### Layout
 - Contenedor `max-width:1240px`; padding lateral 40px (20px en móvil).
-- Debe verse bien de 390px a 1920px, sin scroll horizontal.
+- Debe verse bien de 390px a 1920px, sin scroll horizontal (`main` lleva `overflow-x:clip`).
+- Cabecera fija de 96px (`--header-h`): el contenido de las páginas internas empieza debajo (`main.under-header`) y todos los `[id]` llevan `scroll-margin-top: var(--header-h)`. Los elementos `sticky` se colocan por debajo de la cabecera.
 
 ### Componentes
-- **Botones**: píldora (`border-radius:999px`), alto mínimo 56px (50px en cabecera), texto 17–18px. Principal negro `--ink` con texto blanco. Secundario blanco con borde negro. **Nunca fondo transparente.** Estados hover, foco visible y disabled.
-- **Cabecera** (igual en todas las páginas públicas), con fondo papel beige:
-  - logo «Soul Catering»;
-  - menú: Servicios · Nosotros · Extras · Blog · Contacto;
-  - selector de idioma: icono **globo** de Font Awesome, desplegable, sin borde ni fondo;
-  - botones negros **Reserva** y **Login**.
+- **Botones v5** (`Button` con `variant="v5-dark"` o `"v5-light"`): radio 2px, alto 58px, padding 0 38px, Lato 700 14px, mayúsculas, `letter-spacing:.22em`, borde 1px. Relleno que se desliza en hover (`::before` con `scaleX(0→1)`, `.55s var(--ease)`). `v5-dark`: fondo `--brown`, relleno `--brown-hover`. `v5-light`: fondo **blanco** (nunca transparente), texto `--brown`, borde `rgba(59,40,16,.45)`, relleno `--brown` y texto blanco. Tamaño pequeño (`size="sm"`): 46px, padding 0 24px, 13px. Foco: `outline` de 2px en `--gold-line`, offset 4px. Se usan en el hero, la cabecera y el menú móvil.
+- **Botones del estilo anterior** (`dark`, `light`, `straw`: píldora negra o blanca, 56px, 17–18px, nunca fondo transparente): siguen en el resto de secciones hasta que se decida cambiarlos.
+- **Logo**: apilado, «SOUL» (Cormorant 300, 32px, `letter-spacing:.16em`, `--bronze`) sobre «CATERING» (Lato 400, 11px, `letter-spacing:.42em`, `--text-v5`, 4px por debajo). Componente `Logo`, igual en la cabecera, Acceso, el panel y el pie (en el pie, `tone="light"`).
+- **Cabecera** (igual en todas las páginas públicas): `fixed`, 96px, fondo `rgba(255,255,255,.82)` con `backdrop-filter: blur(10px)` y sombra `0 1px 0 rgba(138,104,48,.12)`. Tras 40px de scroll se añade `.is-solid` (fondo al 97 %). Contiene:
+  - el logo;
+  - el menú Servicios · Nosotros · Extras · Blog · Contacto (Lato 15px, mayúsculas, `letter-spacing:.2em`, `--ink-v5`, separación de 34px, 22px por debajo de 1400px, con una línea en `--gold-line` que crece en hover);
+  - el selector de idioma (globo + código + flecha, sin borde ni fondo; desplegable blanco con borde `--hairline` y radio 2px);
+  - los botones **Reserva** y **Login** (`v5-dark` pequeños).
 
   Todo en una sola línea. Por debajo de 1180px pasa a menú hamburguesa: `<button>` real con `aria-expanded` y `aria-controls`, se cierra con Esc y devuelve el foco al botón.
 - **Tarjeta de servicio**: radio 20px, imagen cuadrada arriba, cuerpo blanco con título, texto y enlace de texto «Descubrir →» (no botón).
-- **Sliders**: CSS `scroll-snap` horizontal, deslizables con el dedo, **flechas gruesas a los lados** (`<button>` con `aria-label`). A partir de 1400px van en el margen, sin fondo; en pantallas más pequeñas van sobre la imagen, dentro de un círculo claro. Nada de librerías de sliders.
-- **Cabeceras de páginas internas**: foto a todo el ancho que se funde abajo con `--bg` mediante un degradado.
-- Áreas táctiles de 44px como mínimo; contraste de 4.5:1 como mínimo.
+- **Sliders** (`Slider`): CSS `scroll-snap`, sin librerías. En pantallas grandes, rejilla con todas las tarjetas; en pantallas pequeñas, carrusel (en Plataforma, hasta 1280px). La cabecera de la sección va en el slot `head`. A su derecha, alineadas abajo con el título (debajo en móvil), van dos flechas cuadradas `.sq-arrow`: 58×58, radio 2px, borde `rgba(59,40,16,.45)`, fondo blanco, flecha fina de 22px; en hover, fondo `--brown` y flecha blanca; separación de 12px. Solo se muestran en modo carrusel. Los puntos indicadores van debajo de las tarjetas.
+- **Testimonios**: las mismas flechas, a ambos lados de los indicadores. Los indicadores son rayas de 2px (16px la inactiva, 36px la activa en `--gold-line`) con un área táctil de 44px.
+- **FAQ**: `<details>`. El «+» es una cruz de líneas finas en `--bronze` que gira 45° al abrir.
+- Áreas táctiles de 44px como mínimo; contraste de 4.5:1 como mínimo; ningún texto en `--gold-line` sobre fondo claro.
 
 ### Hero de Inicio
-- Vídeo en `public/video/`: `<video autoplay muted loop playsinline preload="metadata" poster="...">`, `width:100%`, `height:100svh`, `object-fit:cover`. Tiene que funcionar en iPhone, Android y escritorio.
-- Capa blanca al 22 % encima (no oscurecer). Texto en `--hero-text`. Titular: «Una experiencia culinaria única».
-- No sirvas el vídeo original en 4K. Crea una versión 1080p H.264 con `ffmpeg -i original.mp4 -vf scale=1920:-2 -c:v libx264 -crf 26 -movflags +faststart -an hero.mp4` y un `hero-poster.jpg`. Si `ffmpeg` no está instalado, avísame.
+- Sección `height:100svh; min-height:640px` (`max-height:940px` desde 1024px). Contenido centrado en vertical y en horizontal, de arriba abajo:
+  1. eyebrow con una línea dorada a cada lado;
+  2. H1 en dos líneas («Una experiencia» / «culinaria única», esta en cursiva `--hero-accent`), color `--hero-ink` con `text-shadow` blanco;
+  3. párrafo de 21px (máximo 640px);
+  4. botones «Consultar disponibilidad» (`v5-dark`) y «Ver servicios» (`v5-light`);
+  5. indicador decorativo «DESCUBRE» abajo del todo.
+
+  En móvil, H1 `clamp(44px, 12vw, 64px)` y los botones uno debajo del otro a ancho completo.
+- Velo que no oscurece: halo radial blanco detrás del texto y degradado de blanco a turquesa al 16 %.
+- Vídeo en `public/video/`, más `hero-poster.jpg`. Ambos vídeos en `yuv420p`, 30 fps, sin audio y con `faststart`:
+  - `hero.mp4`: 1080p, H.264 High 4.0;
+  - `hero-720.mp4`: 720p, Main 3.1, para pantallas de hasta 900px.
+- Atributos obligatorios para iOS: `autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback poster aria-hidden tabindex="-1"`. Un script en `astro:page-load` fuerza `muted` y llama a `play()`. Si falla, añade `.no-video` y se ve el póster como fondo fijo, nunca el botón de play nativo.
+
+### Animaciones
+- **Al hacer scroll**: `data-reveal="up|left|right"` y `data-reveal-delay="1|2|3"` (0,12, 0,24 y 0,36 s). Solo ocultan contenido cuando existe la clase `html.js`. `src/scripts/reveal.ts` (IntersectionObserver, `rootMargin '0px 0px -80px 0px'`, `threshold .08`) añade `.is-in`. Dónde se aplica:
+  - cabeceras de sección: `left`;
+  - flechas o columna derecha: `right` con delay 1;
+  - tarjetas de rejilla y del blog: `up`, con delay por columna;
+  - sliders: el contenedor entero con `up`;
+  - nada dentro del hero.
+
+  Si un elemento con `data-reveal` tiene `transform` en hover, defínelo con `[data-reveal].is-in:hover`.
+- **Hero al cargar**:
+  - vídeo con fundido y escala de 1.04 a 1 (1,6 s);
+  - el eyebrow baja 14px;
+  - H1 letra a letra: spans `aria-hidden` y `aria-label` en el `<h1>`, 0,045 s por letra a partir de 0,35 s;
+  - el párrafo y los botones suben 18px (a 1,15 s y 1,35 s);
+  - el indicador de scroll aparece a 1,9 s, con la línea «goteando» en bucle.
+- **Microinteracciones**: las imágenes de tarjetas y del blog hacen `scale(1.05)` en hover (1,1 s `var(--ease)`, dentro de `overflow:hidden`); los enlaces de texto llevan una línea en `--gold-line` que crece de 28px al 100 %.
+- Todo se desactiva con `prefers-reduced-motion: reduce`.
 
 ---
 
@@ -185,7 +229,9 @@ Basado en mi otro proyecto, pero **solo con lo que necesita esta demo**:
     "astro": "^7.3.2",
     "@astrojs/mdx": "^8.0.2",
     "@astrojs/sitemap": "^3.7.4",
-    "@fontsource/plus-jakarta-sans": "^5.3.0",
+    "@fontsource/carlito": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/lato": "^5.3.0",
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/free-brands-svg-icons": "^7.3.1",
@@ -198,9 +244,9 @@ Basado en mi otro proyecto, pero **solo con lo que necesita esta demo**:
 }
 ```
 
-Añade la fuente de los títulos con `npm install @fontsource/cormorant-garamond`.
+Fuentes (ver §6): Cormorant Garamond (títulos), Lato (texto) y Carlito (solo el subconjunto cirílico, como respaldo de Lato en ruso; se declara con `@font-face` y `unicode-range` en `global.css`).
 
-**No incluir**: `@astrojs/markdown-satteri`, `@fontsource-variable/fraunces`, `@fontsource-variable/caveat`, `simple-icons`, `@fortawesome/free-regular-svg-icons` (salvo que haga falta un icono concreto), ni ningún adaptador, SDK de pagos, auth o email.
+**No incluir**: `@astrojs/markdown-satteri`, `@fontsource/plus-jakarta-sans`, `@fontsource/rubik-dirt`, `@fontsource-variable/fraunces`, `@fontsource-variable/caveat`, `simple-icons`, `@fortawesome/free-regular-svg-icons` (salvo que haga falta un icono concreto), ni ningún adaptador, SDK de pagos, auth o email.
 Antes de instalar **cualquier** otro paquete, pregunta.
 
 `astro.config.mjs`:
