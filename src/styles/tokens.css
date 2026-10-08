@@ -88,7 +88,7 @@
 
   /* ── Typography ── */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Lato', system-ui, sans-serif;
+  --font-sans: 'Lato', 'Carlito', system-ui, sans-serif; /* Carlito: Cyrillic only */
 
   /* ── v5 colors (CAMBIOS-v5.md, authorized) ── */
   --brown: #3b2810; /* main button */
