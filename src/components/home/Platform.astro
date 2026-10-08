@@ -31,11 +31,11 @@ const eur = (cents: number) => formatCents(cents, { locale: localeFor(lang), gro
 ---
 
 <section id="plataforma" class="silver section" aria-labelledby="plataforma-title">
-  <div class="container head">
-    <p class="eyebrow">{t('home.platform.eyebrow')}</p>
-    <h2 id="plataforma-title"><TwoLineTitle text={t('home.platform.title')} /></h2>
-  </div>
   <Slider prevLabel={t('home.platform.prev')} nextLabel={t('home.platform.next')} cols={4} gridFrom="xl" wide>
+    <div slot="head" class="head">
+      <p class="eyebrow">{t('home.platform.eyebrow')}</p>
+      <h2 id="plataforma-title"><TwoLineTitle text={t('home.platform.title')} /></h2>
+    </div>
     {
       slides.map((n) => (
         <li class="slide">
@@ -207,7 +207,6 @@ const eur = (cents: number) => formatCents(cents, { locale: localeFor(lang), gro
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin-bottom: 52px;
   }
 
   .head h2 {

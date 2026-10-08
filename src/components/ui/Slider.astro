@@ -1,8 +1,8 @@
 ---
 // Card gallery. Large screens: every card visible in a grid (no carousel).
-// Smaller screens: horizontal swipe carousel (CSS scroll-snap, no libraries) with
-// subtle controls BELOW the cards: back/forward arrows (<button> with aria-label)
-// and small dots that show how many cards there are and which one is in view.
+// Smaller screens: horizontal swipe carousel (CSS scroll-snap, no libraries). The section
+// header goes in the "head" slot; the square arrows (<button> with aria-label) sit on its
+// right (below it on mobile) and small dots BELOW the cards show which card is in view.
 interface Props {
   prevLabel: string;
   nextLabel: string;
@@ -18,39 +18,43 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
 ---
 
 <div class:list={['slider', `grid-${gridFrom}`, { wide }]} style={`--cols:${cols}`} data-slider>
+  <!-- Section header (slot "head") with the arrows on the right, aligned to the bottom of the title -->
+  <div class="container slider-head">
+    <div class="head-text"><slot name="head" /></div>
+    <div class="arrows">
+      <button type="button" class="sq-arrow" aria-label={prevLabel} data-slider-prev>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"></path></svg
+        >
+      </button>
+      <button type="button" class="sq-arrow" aria-label={nextLabel} data-slider-next>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"></path></svg
+        >
+      </button>
+    </div>
+  </div>
   <ul class="track" data-slider-track>
     <slot />
   </ul>
-  <div class="controls">
-    <button type="button" class="sarrow" aria-label={prevLabel} data-slider-prev>
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"><path d="M20 12H5M11 5l-7 7 7 7"></path></svg
-      >
-    </button>
-    <!-- Visual indicator only: the arrows and swiping are the controls -->
-    <div class="dots" aria-hidden="true" data-slider-dots></div>
-    <button type="button" class="sarrow" aria-label={nextLabel} data-slider-next>
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"></path></svg
-      >
-    </button>
-  </div>
+  <!-- Visual indicator only: the arrows and swiping are the controls -->
+  <div class="dots" aria-hidden="true" data-slider-dots></div>
 </div>
 
 <style>
@@ -91,44 +95,22 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
     scroll-snap-align: start;
   }
 
-  .controls {
+  .slider-head {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 4px var(--gutter) 0;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 52px;
   }
 
-  .sarrow {
+  .head-text {
+    min-width: 0;
+  }
+
+  .arrows {
+    display: flex;
+    gap: 12px;
     flex: none;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1.5px solid var(--line-strong);
-    background: var(--white);
-    color: var(--ink);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition:
-      border-color 0.2s ease,
-      background-color 0.2s ease;
-  }
-
-  .sarrow:hover {
-    border-color: var(--ink);
-    background: var(--light-hover);
-  }
-
-  .sarrow:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-
-  .sarrow:disabled:hover {
-    border-color: var(--line-strong);
-    background: var(--white);
   }
 
   .dots {
@@ -138,6 +120,8 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
     justify-content: center;
     gap: 8px;
     min-width: 0;
+    min-height: 24px;
+    padding: 4px var(--gutter) 0;
   }
 
   /* Inactive: small round dot. Active: longer dark pill (shape, not just colour). */
@@ -160,6 +144,14 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
     .track > :global(li) {
       flex-basis: 84%;
     }
+
+    /* Mobile: arrows below the title */
+    .slider-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+      margin-bottom: 36px;
+    }
   }
 
   /* ── Grid: all the cards visible, no carousel ── */
@@ -177,7 +169,8 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
       flex-basis: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
     }
 
-    .grid-lg .controls {
+    .grid-lg .arrows,
+    .grid-lg .dots {
       display: none;
     }
   }
@@ -196,7 +189,8 @@ const { prevLabel, nextLabel, cols = 3, gridFrom = 'lg', wide = false } = Astro.
       flex-basis: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
     }
 
-    .grid-xl .controls {
+    .grid-xl .arrows,
+    .grid-xl .dots {
       display: none;
     }
   }

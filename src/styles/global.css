@@ -333,6 +333,45 @@ p {
   font-size: 13px;
 }
 
+/* ── Square arrows of sliders and testimonials (CAMBIOS-v5 §5) ── */
+.sq-arrow {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: 1px solid rgba(59, 40, 16, 0.45);
+  border-radius: 2px;
+  background: var(--white);
+  color: var(--brown);
+  cursor: pointer;
+  transition:
+    background-color 0.4s var(--ease),
+    color 0.4s var(--ease);
+}
+
+.sq-arrow:hover {
+  background: var(--brown);
+  color: var(--white);
+}
+
+.sq-arrow:focus-visible {
+  outline: 2px solid var(--gold-line);
+  outline-offset: 4px;
+}
+
+.sq-arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.sq-arrow:disabled:hover {
+  background: var(--white);
+  color: var(--brown);
+}
+
 /* ── Inputs ── */
 .input {
   min-height: 58px;
@@ -499,10 +538,22 @@ a.is-pending {
 }
 
 /* ── Backgrounds ──
-   General background: solid --bg (replaces the beige paper texture).
+   Solid neutral colors (CAMBIOS-v5 §5, no paper texture).
    Gray texture of lights and shadows: always beneath the text. */
 .bg-base {
   background-color: var(--bg);
+}
+
+.bg-ivory {
+  background-color: var(--ivory);
+}
+
+.bg-cream {
+  background-color: var(--cream);
+}
+
+.bg-white {
+  background-color: var(--white);
 }
 
 .silver {

@@ -11,15 +11,13 @@ const t = useTranslations(lang);
 const homeExtras = getExtras(t).slice(0, HOME_EXTRAS_COUNT);
 ---
 
-<section id="extras" class="bg-base section" aria-labelledby="extras-title">
-  <div class="container">
-    <div class="head">
+<section id="extras" class="bg-white section" aria-labelledby="extras-title">
+  <Slider prevLabel={t('home.extras.prev')} nextLabel={t('home.extras.next')} cols={4}>
+    <div slot="head" class="head">
       <p class="eyebrow">{t('home.extras.eyebrow')}</p>
       <h2 id="extras-title"><TwoLineTitle text={t('home.extras.title')} /></h2>
       <p class="lead">{t('home.extras.text')}</p>
     </div>
-  </div>
-  <Slider prevLabel={t('home.extras.prev')} nextLabel={t('home.extras.next')} cols={4}>
     {homeExtras.map((extra, i) => <ExtraCard extra={extra} index={i} />)}
   </Slider>
   <div class="container more">
@@ -36,7 +34,6 @@ const homeExtras = getExtras(t).slice(0, HOME_EXTRAS_COUNT);
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin-bottom: 52px;
     max-width: 760px;
   }
 

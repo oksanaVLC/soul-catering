@@ -10,12 +10,12 @@ const t = useTranslations(lang);
 const services = getServices(t);
 ---
 
-<section id="servicios" class="bg-base section" aria-labelledby="servicios-title">
-  <div class="container head">
-    <p class="eyebrow">{t('home.services.eyebrow')}</p>
-    <h2 id="servicios-title"><TwoLineTitle text={t('home.services.title')} /></h2>
-  </div>
+<section id="servicios" class="bg-ivory section" aria-labelledby="servicios-title">
   <Slider prevLabel={t('home.services.prev')} nextLabel={t('home.services.next')} cols={3}>
+    <div slot="head" class="head">
+      <p class="eyebrow">{t('home.services.eyebrow')}</p>
+      <h2 id="servicios-title"><TwoLineTitle text={t('home.services.title')} /></h2>
+    </div>
     {
       services.map((s) => (
         <ServiceCard
@@ -39,7 +39,6 @@ const services = getServices(t);
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin-bottom: 52px;
   }
 
   .head h2 {

@@ -18,32 +18,6 @@ const total = testimonials.length;
       ></path>
     </svg>
     <div class="stage">
-      <button type="button" class="qarrow l" aria-label={t('home.testimonials.prev')} data-quote-prev>
-        <svg
-          width="34"
-          height="34"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"><path d="M20 12H5M11 5l-7 7 7 7"></path></svg
-        >
-      </button>
-      <button type="button" class="qarrow r" aria-label={t('home.testimonials.next')} data-quote-next>
-        <svg
-          width="34"
-          height="34"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"></path></svg
-        >
-      </button>
       <div aria-live="polite">
         {
           testimonials.map((q, i) => (
@@ -58,20 +32,48 @@ const total = testimonials.length;
         }
       </div>
     </div>
-    <div class="dots">
-      {
-        testimonials.map((_, i) => (
-          <button
-            type="button"
-            class="dot"
-            aria-label={t('home.testimonials.dot', { n: i + 1, total })}
-            aria-pressed={i === 0 ? 'true' : 'false'}
-            data-quote-dot={i}
-          >
-            <span />
-          </button>
-        ))
-      }
+    <div class="qnav">
+      <button type="button" class="sq-arrow" aria-label={t('home.testimonials.prev')} data-quote-prev>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6"></path></svg
+        >
+      </button>
+      <div class="dots">
+        {
+          testimonials.map((_, i) => (
+            <button
+              type="button"
+              class="dot"
+              aria-label={t('home.testimonials.dot', { n: i + 1, total })}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              data-quote-dot={i}
+            >
+              <span />
+            </button>
+          ))
+        }
+      </div>
+      <button type="button" class="sq-arrow" aria-label={t('home.testimonials.next')} data-quote-next>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"></path></svg
+        >
+      </button>
     </div>
     <p class="demo">{t('home.testimonials.demo')}</p>
   </div>
@@ -97,9 +99,7 @@ const total = testimonials.length;
   }
 
   .stage {
-    position: relative;
     width: 100%;
-    padding: 0 76px;
   }
 
   blockquote {
@@ -135,44 +135,23 @@ const total = testimonials.length;
     color: var(--text-2);
   }
 
-  .qarrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 60px;
-    height: 60px;
-    border: 0;
-    border-radius: 50%;
-    background: none;
-    color: var(--ink);
+  /* Arrows on both sides of the indicators */
+  .qnav {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-
-  .qarrow:hover {
-    transform: translateY(-50%) scale(1.08);
-  }
-
-  .qarrow.l {
-    left: 0;
-  }
-
-  .qarrow.r {
-    right: 0;
+    gap: 16px;
   }
 
   .dots {
     display: flex;
-    gap: 4px;
+    gap: 0;
   }
 
+  /* Indicators: 2px bars (16px inactive, 36px active), 44px touch area */
   .dot {
-    width: 44px;
+    min-width: 44px;
     height: 44px;
-    border-radius: 50%;
+    padding: 0 4px;
     border: 0;
     background: transparent;
     cursor: pointer;
@@ -183,14 +162,17 @@ const total = testimonials.length;
 
   .dot span {
     display: block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink);
+    width: 16px;
+    height: 2px;
+    background: rgba(59, 40, 16, 0.45);
+    transition:
+      width 0.4s var(--ease),
+      background-color 0.4s var(--ease);
   }
 
   .dot[aria-pressed='true'] span {
-    background: var(--ink);
+    width: 36px;
+    background: var(--gold-line);
   }
 
   .demo {
@@ -203,26 +185,8 @@ const total = testimonials.length;
       padding: 88px 0;
     }
 
-    .stage {
-      padding: 0 0 76px;
-    }
-
-    .qarrow {
-      top: auto;
-      bottom: 0;
-      transform: none;
-    }
-
-    .qarrow:hover {
-      transform: scale(1.08);
-    }
-
-    .qarrow.l {
-      left: calc(50% - 72px);
-    }
-
-    .qarrow.r {
-      right: calc(50% - 72px);
+    .qnav {
+      gap: 8px;
     }
   }
 </style>
