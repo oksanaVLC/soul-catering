@@ -4,47 +4,69 @@ import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils'
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+// Title in two lines: «|» separates the plain line from the italic one.
+const [titleLine1, titleLine2 = ''] = t('home.hero.title').split('|');
 ---
 
 <section class="hero" aria-label={t('home.hero.label')}>
+  <!-- All attributes are required for autoplay on iOS Safari (CAMBIOS-v5 §4) -->
   <video
+    class="hero-video"
     autoplay
     muted
     loop
     playsinline
-    preload="metadata"
+    webkit-playsinline
+    preload="auto"
+    disablepictureinpicture
+    disableremoteplayback
     poster="/video/hero-poster.jpg"
     aria-hidden="true"
     tabindex="-1"
   >
+    <source src="/video/hero-720.mp4" type="video/mp4" media="(max-width: 900px)" />
     <source src="/video/hero.mp4" type="video/mp4" />
   </video>
   <div class="veil" aria-hidden="true"></div>
   <div class="container content">
-    <div class="copy">
-      <p class="eyebrow">{t('home.hero.eyebrow')}</p>
-      <h1>{t('home.hero.title')}</h1>
-      <p class="text">{t('home.hero.text')}</p>
-      <div class="ctas">
-        <Button href="#servicios">{t('home.hero.ctaServices')}</Button>
-        <Button href={localizePath('/reserva', lang)}>{t('home.hero.ctaBook')}</Button>
-      </div>
+    <p class="eyebrow"><span>{t('home.hero.eyebrow')}</span></p>
+    <h1>
+      <span class="line1">{titleLine1}</span>
+      <br />
+      <em>{titleLine2}</em>
+    </h1>
+    <p class="text">{t('home.hero.text')}</p>
+    <div class="ctas">
+      <Button href={localizePath('/reserva', lang)} variant="v5-dark">{t('home.hero.ctaBook')}</Button>
+      <Button href="#servicios" variant="v5-light">{t('home.hero.ctaServices')}</Button>
     </div>
+  </div>
+  <div class="scroll-cue" aria-hidden="true">
+    <span class="cue-line"></span>
+    <span class="cue-text">{t('home.hero.scroll')}</span>
   </div>
 </section>
 
 <style>
-  /* The section grows with its content (min-height, not height): on short or narrow
-     phones the copy is never pushed up beneath the overlay header. */
+  /* Fallback: if the video cannot start, the poster is seen as a still image. */
   .hero {
     position: relative;
     display: flex;
-    min-height: 100svh;
+    align-items: center;
+    height: 100svh;
+    min-height: 640px;
     overflow: hidden;
-    background: var(--progress-bg);
+    background: #e9efec url('/video/hero-poster.jpg') center / cover no-repeat;
   }
 
-  video {
+  @media (min-width: 1024px) {
+    .hero {
+      max-height: 940px;
+    }
+  }
+
+  .hero-video {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -52,13 +74,28 @@ const t = useTranslations(lang);
     object-fit: cover;
   }
 
-  /* White layer at 22 % (lighten, not darken) */
+  /* Never show the native iOS play button (Low Power Mode blocks autoplay) */
+  .hero-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none;
+  }
+
+  .hero-video::-webkit-media-controls {
+    display: none !important;
+  }
+
+  .hero.no-video .hero-video {
+    display: none;
+  }
+
+  /* Very soft white-to-turquoise veil + white halo behind the text (does not darken) */
   .veil {
     position: absolute;
     inset: 0;
-    background: var(--white);
-    opacity: 0.22;
     pointer-events: none;
+    background:
+      radial-gradient(ellipse 58% 52% at 50% 54%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 75%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, rgba(178, 226, 232, 0.16) 100%);
   }
 
   .content {
@@ -66,54 +103,100 @@ const t = useTranslations(lang);
     z-index: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    padding-top: calc(var(--header-h) + 48px);
-    padding-bottom: 96px;
+    align-items: center;
+    text-align: center;
+    padding-top: 72px;
+    /* room for the scroll cue, so it never overlaps the buttons */
+    padding-bottom: 116px;
   }
 
-  .copy {
-    max-width: 860px;
+  /* Eyebrow with a gold line on each side (flex: the lines stay centred when the text wraps) */
+  .eyebrow {
     display: flex;
-    flex-direction: column;
-    gap: 26px;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: 15px;
+    color: var(--hero-eyebrow);
   }
 
-  .eyebrow,
-  h1,
-  .text {
-    color: var(--hero-text);
+  .eyebrow::before,
+  .eyebrow::after {
+    content: '';
+    flex: none;
+    width: 44px;
+    height: 1px;
+    margin: 0;
+    background: var(--gold-line);
   }
 
   h1 {
-    font-size: clamp(52px, 7.6vw, 104px);
+    margin-top: 34px;
+    color: var(--hero-ink);
+    text-shadow: 0 1px 18px rgba(255, 255, 255, 0.55);
+  }
+
+  h1 em {
+    color: var(--hero-accent);
   }
 
   .text {
-    font-size: 22px;
-    line-height: 1.6;
-    max-width: 600px;
-    font-weight: 500;
+    margin-top: 30px;
+    max-width: 640px;
+    font-size: 21px;
+    line-height: 1.7;
+    color: var(--hero-ink);
+    text-shadow: 0 1px 12px rgba(255, 255, 255, 0.7);
   }
 
   .ctas {
     display: flex;
     flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 6px;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 42px;
+  }
+
+  /* Scroll cue (decorative) */
+  .scroll-cue {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cue-line {
+    display: block;
+    width: 1px;
+    height: 56px;
+    background: rgba(59, 40, 16, 0.55);
+  }
+
+  .cue-text {
+    font: 700 11px/1 var(--font-sans);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--brown);
   }
 
   @media (max-width: 700px) {
-    .content {
-      padding-top: calc(var(--header-h) + 32px);
-      padding-bottom: 48px;
+    .eyebrow {
+      gap: 10px;
+      letter-spacing: 0.2em;
     }
 
-    .copy {
-      gap: 18px;
+    .eyebrow::before,
+    .eyebrow::after {
+      width: 24px;
     }
 
     h1 {
-      font-size: clamp(44px, 12vw, 56px);
+      font-size: clamp(44px, 12vw, 64px);
     }
 
     .text {
@@ -121,12 +204,36 @@ const t = useTranslations(lang);
     }
 
     .ctas {
-      gap: 10px;
+      flex-direction: column;
+      align-self: stretch;
     }
 
-    .ctas :global(.btn) {
-      flex: 1 1 auto;
-      padding: 0 22px;
+    .ctas :global(.btn-v5) {
+      width: 100%;
+      padding: 0 20px;
+    }
+  }
+
+  /* Short screens (landscape phones): the scroll cue would overlap the buttons */
+  @media (max-height: 720px) {
+    .scroll-cue {
+      display: none;
     }
   }
 </style>
+
+<script>
+  // With ClientRouter, autoplay does not fire by itself when coming back to the home page.
+  document.addEventListener('astro:page-load', () => {
+    const v = document.querySelector<HTMLVideoElement>('.hero-video');
+    if (v) {
+      v.muted = true;
+      v.defaultMuted = true;
+      v.playsInline = true;
+      v.setAttribute('muted', '');
+      v.setAttribute('playsinline', '');
+      const p = v.play();
+      if (p && p.catch) p.catch(() => v.closest('.hero')?.classList.add('no-video'));
+    }
+  });
+</script>
