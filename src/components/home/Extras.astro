@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../ui/TwoLineTitle.astro';
 import Slider from '../ui/Slider.astro';
 import ExtraCard from '../ui/ExtraCard.astro';
 import Button from '../ui/Button.astro';
@@ -14,7 +15,7 @@ const homeExtras = getExtras(t).slice(0, HOME_EXTRAS_COUNT);
   <div class="container">
     <div class="head">
       <p class="eyebrow">{t('home.extras.eyebrow')}</p>
-      <h2 id="extras-title">{t('home.extras.title')}</h2>
+      <h2 id="extras-title"><TwoLineTitle text={t('home.extras.title')} /></h2>
       <p class="lead">{t('home.extras.text')}</p>
     </div>
   </div>

@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../ui/TwoLineTitle.astro';
 // «La plataforma»: 7 cards whose «images» are mini-screens made in HTML/CSS (not photos).
 // The mini-screens are decorative illustrations (aria-hidden) with the design's demo data;
 // that is why some of their texts are smaller than 15px, as in the design.
@@ -32,7 +33,7 @@ const eur = (cents: number) => formatCents(cents, { locale: localeFor(lang), gro
 <section id="plataforma" class="silver section" aria-labelledby="plataforma-title">
   <div class="container head">
     <p class="eyebrow">{t('home.platform.eyebrow')}</p>
-    <h2 id="plataforma-title">{t('home.platform.title')}</h2>
+    <h2 id="plataforma-title"><TwoLineTitle text={t('home.platform.title')} /></h2>
   </div>
   <Slider prevLabel={t('home.platform.prev')} nextLabel={t('home.platform.next')} cols={4} gridFrom="xl" wide>
     {

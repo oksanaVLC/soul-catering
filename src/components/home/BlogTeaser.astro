@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../ui/TwoLineTitle.astro';
 import BlogCard from '../ui/BlogCard.astro';
 import Button from '../ui/Button.astro';
 import { getHomePosts } from '../../data/blog';
@@ -14,7 +15,7 @@ const homePosts = getHomePosts(t);
     <div class="head">
       <div class="titles">
         <p class="eyebrow">{t('home.blog.eyebrow')}</p>
-        <h2 id="blog-title">{t('home.blog.title')}</h2>
+        <h2 id="blog-title"><TwoLineTitle text={t('home.blog.title')} /></h2>
       </div>
       <Button href={localizePath('/blog', lang)} variant="light">{t('home.blog.cta')}</Button>
     </div>
@@ -49,9 +50,6 @@ const homePosts = getHomePosts(t);
     gap: 20px;
   }
 
-  h2 {
-    font-size: clamp(40px, 4.4vw, 56px);
-  }
 
   .grid {
     display: grid;

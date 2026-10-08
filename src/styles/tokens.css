@@ -88,8 +88,23 @@
 
   /* ── Typography ── */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-sans: 'Lato', system-ui, sans-serif;
   --font-logo: 'Rubik Dirt', var(--font-serif);
+
+  /* ── v5 colors (CAMBIOS-v5.md, authorized) ── */
+  --brown: #3b2810; /* main button */
+  --brown-hover: #1e1a16;
+  --bronze: #7a5a22; /* eyebrows, numbers, italics in headings — 6:1 on white */
+  --gold-line: #c9a96e; /* ONLY decorative lines, never text on a light background */
+  --ink-v5: #1e1a16; /* headings */
+  --text-v5: #4a4033; /* paragraphs — 9.6:1 on white */
+  --ivory: #f4f0ea; /* neutral background 1 */
+  --cream: #faf7f2; /* neutral background 2 */
+  --hairline: rgba(138, 104, 48, 0.22);
+  --hero-ink: #2a1c10;
+  --hero-accent: #5e4418;
+  --hero-eyebrow: #5a4216;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* ── Layout ── */
   --container: 1240px;

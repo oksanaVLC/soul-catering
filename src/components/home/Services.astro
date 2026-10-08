@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../ui/TwoLineTitle.astro';
 import Slider from '../ui/Slider.astro';
 import ServiceCard from '../ui/ServiceCard.astro';
 import { getServices } from '../../data/services';
@@ -12,7 +13,7 @@ const services = getServices(t);
 <section id="servicios" class="bg-base section" aria-labelledby="servicios-title">
   <div class="container head">
     <p class="eyebrow">{t('home.services.eyebrow')}</p>
-    <h2 id="servicios-title">{t('home.services.title')}</h2>
+    <h2 id="servicios-title"><TwoLineTitle text={t('home.services.title')} /></h2>
   </div>
   <Slider prevLabel={t('home.services.prev')} nextLabel={t('home.services.next')} cols={3}>
     {

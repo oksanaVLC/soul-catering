@@ -1,0 +1,12 @@
+---
+// Section H2 in two lines: the i18n text uses «|» as separator and the second line
+// goes inside <em> (italic, --bronze). Without separator it renders as one line.
+interface Props {
+  text: string;
+}
+
+const [first, ...rest] = Astro.props.text.split('|');
+const second = rest.join(' ');
+---
+
+{first}{second && <><br /><em>{second}</em></>}

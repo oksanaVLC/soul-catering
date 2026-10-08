@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../ui/TwoLineTitle.astro';
 // «Seis pasos, sin llamadas» band: the six steps of the approved booking (CLAUDE.md §5).
 import { Image } from 'astro:assets';
 import aceitunas from '../../assets/images/aceitunas-tablas.jpg';
@@ -22,7 +23,7 @@ const steps = [1, 2, 3, 4, 5, 6] as const;
   <div class="body">
     <div class="head">
       <p class="eyebrow">{t('home.steps.eyebrow')}</p>
-      <h2 id="pasos-title">{t('home.steps.title')}</h2>
+      <h2 id="pasos-title"><TwoLineTitle text={t('home.steps.title')} /></h2>
     </div>
     <ol>
       {
@@ -102,9 +103,6 @@ const steps = [1, 2, 3, 4, 5, 6] as const;
     gap: 20px;
   }
 
-  h2 {
-    font-size: clamp(40px, 4.4vw, 60px);
-  }
 
   ol {
     list-style: none;

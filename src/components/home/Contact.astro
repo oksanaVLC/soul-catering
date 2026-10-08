@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../ui/TwoLineTitle.astro';
 // Contact: details with placeholders and a form with native validation.
 // On submit it only shows the simulated success message (sends nothing).
 import Button from '../ui/Button.astro';
@@ -12,7 +13,7 @@ const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
   <div class="container wrap">
     <div class="info">
       <p class="eyebrow">{t('home.contact.eyebrow')}</p>
-      <h2 id="contacto-title">{t('home.contact.title')}</h2>
+      <h2 id="contacto-title"><TwoLineTitle text={t('home.contact.title')} /></h2>
       <p class="lead">{t('home.contact.text')}</p>
       <dl>
         <div>
@@ -109,9 +110,6 @@ const eventTypes = ['boda', 'empresa', 'privada', 'comunion', 'otro'] as const;
     min-width: 0;
   }
 
-  h2 {
-    font-size: clamp(40px, 4.4vw, 60px);
-  }
 
   .lead {
     font-size: 19px;

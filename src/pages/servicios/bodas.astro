@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../../components/ui/TwoLineTitle.astro';
 // /servicios/bodas: the only service with an approved design.
 // [PRECIO], [MÍN]–[MÁX], [NOMBRE]… are design placeholders (no prices are made up).
 // «Paso a paso» is the process of a wedding, NOT the booking flow (CLAUDE.md §5).
@@ -95,7 +96,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
     <div class="container stack">
       <div class="head">
         <p class="eyebrow">{t('bodas.momentsEyebrow')}</p>
-        <h2 id="momentos-title">{t('bodas.momentsTitle')}</h2>
+        <h2 id="momentos-title"><TwoLineTitle text={t('bodas.momentsTitle')} /></h2>
       </div>
       <div class="moments">
         {
@@ -122,7 +123,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
     <div class="container menu-grid">
       <div class="menu-intro">
         <p class="eyebrow">{t('bodas.menuEyebrow')}</p>
-        <h2 id="menu-title">{t('bodas.menuTitle')}</h2>
+        <h2 id="menu-title"><TwoLineTitle text={t('bodas.menuTitle')} /></h2>
         <p class="lead">{t('bodas.menuLead')}</p>
         <Image
           src={canapesRemolacha}
@@ -169,7 +170,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
     <div class="container stack">
       <div class="head">
         <p class="eyebrow">{t('bodas.extrasEyebrow')}</p>
-        <h2 id="adicionales-title">{t('bodas.extrasTitle')}</h2>
+        <h2 id="adicionales-title"><TwoLineTitle text={t('bodas.extrasTitle')} /></h2>
       </div>
       <div class="table-wrap">
         <table>
@@ -199,7 +200,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
     <div class="container stack">
       <div class="head">
         <p class="eyebrow">{t('bodas.processEyebrow')}</p>
-        <h2 id="proceso-title">{t('bodas.processTitle')}</h2>
+        <h2 id="proceso-title"><TwoLineTitle text={t('bodas.processTitle')} /></h2>
       </div>
       <ol class="process">
         {
@@ -220,7 +221,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
     <div class="container faq-grid">
       <div class="head">
         <p class="eyebrow">{t('bodas.faqEyebrow')}</p>
-        <h2 id="faq-bodas-title">{t('bodas.faqTitle')}</h2>
+        <h2 id="faq-bodas-title"><TwoLineTitle text={t('bodas.faqTitle')} /></h2>
       </div>
       <FaqList items={faq} />
     </div>
@@ -229,7 +230,7 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
   <!-- CTA -->
   <section class="bg-base block cta" aria-labelledby="cta-title">
     <div class="container cta-inner">
-      <h2 id="cta-title">{t('bodas.ctaTitle')}</h2>
+      <h2 id="cta-title"><TwoLineTitle text={t('bodas.ctaTitle')} /></h2>
       <p class="lead">{t('bodas.ctaText')}</p>
       <Button href={bookHref}>{t('bodas.ctaButton')}</Button>
     </div>
@@ -252,9 +253,6 @@ const faq = [1, 2, 3, 4].map((n) => ({ q: t(`bodas.q${n}`), a: t(`bodas.a${n}`) 
     gap: 14px;
   }
 
-  h2 {
-    font-size: clamp(40px, 4.4vw, 58px);
-  }
 
   .keys {
     background: var(--white);

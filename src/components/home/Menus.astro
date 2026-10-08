@@ -1,4 +1,5 @@
 ---
+import TwoLineTitle from '../ui/TwoLineTitle.astro';
 // «Nuestros menús»: the 3 booking menus with their DEMO price and a «Ver platos» button
 // that opens a native <dialog> with the dishes (photo, short description and allergens).
 import { Image } from 'astro:assets';
@@ -20,7 +21,7 @@ const price = (cents: number) => t('booking.perPerson', { price: formatAmount(ce
 <section id="menus" class="bg-base section" aria-labelledby="menus-title">
   <div class="container head">
     <p class="eyebrow">{t('home.menus.eyebrow')}</p>
-    <h2 id="menus-title">{t('home.menus.title')}</h2>
+    <h2 id="menus-title"><TwoLineTitle text={t('home.menus.title')} /></h2>
     <p class="lead">{t('home.menus.text')}</p>
     <p class="demo">{t('home.menus.demo')}</p>
   </div>
