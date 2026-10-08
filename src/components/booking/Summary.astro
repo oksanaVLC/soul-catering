@@ -95,7 +95,7 @@ const hasCity = summary.venue.city.trim() !== '';
     flex: 1 1 430px;
     min-width: 0;
     position: sticky;
-    top: 24px;
+    top: calc(var(--header-h) + 24px); /* below the fixed header */
     background: var(--white);
     border: 1px solid var(--line);
     border-radius: 12px;

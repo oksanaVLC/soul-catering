@@ -3,14 +3,18 @@ import type { HTMLAttributes } from 'astro/types';
 
 type Props = {
   href?: string;
-  variant?: 'dark' | 'light' | 'straw';
+  /** v5-dark / v5-light: v5 style (hero and header). The rest: previous style. */
+  variant?: 'dark' | 'light' | 'straw' | 'v5-dark' | 'v5-light';
   size?: 'md' | 'sm';
   type?: 'button' | 'submit' | 'reset';
   class?: string;
 } & Omit<HTMLAttributes<'a'> & HTMLAttributes<'button'>, 'type' | 'class'>;
 
 const { href, variant = 'dark', size = 'md', type = 'button', class: extra, ...rest } = Astro.props;
-const classes = ['btn', `btn-${variant}`, size === 'sm' && 'btn-sm', extra];
+const isV5 = variant.startsWith('v5-');
+const classes = isV5
+  ? ['btn-v5', `btn-${variant}`, size === 'sm' && 'btn-v5-sm', extra]
+  : ['btn', `btn-${variant}`, size === 'sm' && 'btn-sm', extra];
 ---
 
 {

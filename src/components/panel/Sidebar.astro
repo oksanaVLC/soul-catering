@@ -3,6 +3,7 @@
 // keep the design's appearance but are NOT functional (no href, «pendiente» for screen readers)
 // until there is an approved specification. No fictitious pages are created.
 import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+import Logo from '../ui/Logo.astro';
 
 type Item = { key: string; href: string | null; icon: string };
 
@@ -24,7 +25,7 @@ const items: Item[] = [
 
 <aside class="side" aria-label={t('panel.navLabel')}>
   <a href={localizePath('/', lang)} class="brand" aria-label={t('nav.home')}>
-    <span class="logo-font brand-name">{t('site.name')}</span>
+    <Logo link={false} />
     <span class="brand-sub">{t('panel.brandSub')}</span>
   </a>
   <nav aria-label={t('panel.navLabel')}>
@@ -78,10 +79,6 @@ const items: Item[] = [
     padding: 0 12px;
     text-decoration: none;
     color: var(--ink);
-  }
-
-  .brand-name {
-    font-size: 30px;
   }
 
   /* Design: 13px; 15px (CLAUDE.md minimum for real text) */

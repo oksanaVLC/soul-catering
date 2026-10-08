@@ -2,15 +2,12 @@
 import { getLangFromUrl, localizePath, switchLangPath, useTranslations } from '../../i18n/utils';
 
 import Button from '../ui/Button.astro';
+import Logo from '../ui/Logo.astro';
 import LangSwitcher from './LangSwitcher.astro';
 import MobileMenu, { type NavItem } from './MobileMenu.astro';
 
 interface Props {
-  /** On top of the hero (Inicio): absolute position, same appearance. */
-  overlay?: boolean;
 }
-
-const { overlay = false } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -57,11 +54,9 @@ const bookHref = localizePath('/reserva', lang);
 const loginHref = localizePath('/acceso', lang);
 ---
 
-<header class:list={['site-header', 'bg-base', { overlay }]}>
+<header class="site-header" data-site-header>
   <div class="container bar">
-    <a href={home} class="logo logo-font" aria-label={t('nav.home')}>
-      {t('site.name')}
-    </a>
+    <Logo />
 
     <nav class="nav-desktop" aria-label={t('nav.label')}>
       {items.map((item) => (
@@ -74,11 +69,11 @@ const loginHref = localizePath('/acceso', lang);
     <div class="tools">
       <LangSwitcher />
 
-      <Button href={bookHref} size="sm" class="nav-desktop">
+      <Button href={bookHref} variant="v5-dark" size="sm" class="nav-desktop">
         {t('nav.book')}
       </Button>
 
-      <Button href={loginHref} size="sm" class="nav-desktop">
+      <Button href={loginHref} variant="v5-dark" size="sm" class="nav-desktop">
         {t('nav.login')}
       </Button>
 
@@ -94,98 +89,89 @@ const loginHref = localizePath('/acceso', lang);
   not as a child of it.
 -->
 <style>
+  /* Fixed and translucent on every public page (CAMBIOS-v5 §2).
+     .is-solid (after 40px of scroll) makes the background almost opaque. */
   .site-header {
-    position: relative;
-    z-index: 2000;
-
-    width: 100%;
-
-    border-bottom: 1px solid var(--line-header);
-  }
-
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  /*
-   * When the mobile menu is open, the header becomes fixed.
-   *
-   * This is what keeps the logo, language switcher and X
-   * visible even if the user opened the menu after scrolling.
-   */
-  html.mobile-menu-open .site-header {
     position: fixed;
-
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
+    z-index: 50;
+    height: var(--header-h);
+    background: rgba(255, 255, 255, 0.82);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 0 rgba(138, 104, 48, 0.12);
+    transition: background-color 0.5s var(--ease);
+  }
 
-    width: 100%;
-
-    z-index: 2000;
+  .site-header.is-solid {
+    background: rgba(255, 255, 255, 0.97);
   }
 
   .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 20px;
-
-    height: var(--header-h);
-
+    height: 100%;
     flex-wrap: nowrap;
-  }
-
-  .logo {
-    display: inline-flex;
-    align-items: center;
-
-    min-height: 44px;
-
-    font-size: 30px;
-
-    text-decoration: none;
-    color: var(--ink);
-
-    white-space: nowrap;
   }
 
   nav {
     display: flex;
-    gap: 20px;
+    gap: 34px;
     align-items: center;
     flex-wrap: nowrap;
   }
 
   .navlink {
-    color: var(--ink);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink-v5);
     text-decoration: none;
-
-    font-size: 17px;
-    font-weight: 600;
-
-    padding: 10px 4px;
-
+    font: 400 15px/1 var(--font-sans);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
     white-space: nowrap;
   }
 
-  .navlink:hover,
-  .navlink[aria-current] {
-    text-decoration: underline;
-    text-underline-offset: 6px;
+  /* 1px line in --gold-line that grows on hover (and marks the current page) */
+  .navlink::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0.2em; /* compensates the trailing letter-spacing */
+    bottom: 8px;
+    height: 1px;
+    background: var(--gold-line);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease);
+  }
+
+  .navlink:hover {
+    color: var(--ink-v5);
+  }
+
+  .navlink:hover::after,
+  .navlink[aria-current]::after {
+    transform: scaleX(1);
   }
 
   .tools {
     display: flex;
     align-items: center;
-
     gap: 10px;
-
     flex: none;
+  }
+
+  /* Narrow desktops: less space between links so everything stays on one line */
+  @media (max-width: 1400px) {
+    nav {
+      gap: 22px;
+    }
   }
 
   @media (max-width: 1180px) {
@@ -195,44 +181,29 @@ const loginHref = localizePath('/acceso', lang);
     }
   }
 
-  @media (max-width: 420px) {
-    .bar {
-      gap: 8px;
-    }
-
-    .logo {
-      font-size: 25px;
-    }
-
-    .tools {
-      gap: 4px;
-    }
-  }
-
   @media (max-width: 360px) {
     .bar {
+      gap: 8px;
       padding-left: 16px;
       padding-right: 16px;
-    }
-
-    .logo {
-      font-size: 20px;
     }
 
     .tools {
       gap: 0;
     }
   }
-
-  @media (max-width: 300px) {
-    .bar {
-      gap: 4px;
-      padding-left: 12px;
-      padding-right: 8px;
-    }
-
-    .logo {
-      font-size: 17px;
-    }
-  }
 </style>
+
+<script>
+  // .is-solid after 40px of scroll. Passive listener, re-bound after each navigation.
+  let onScroll: (() => void) | null = null;
+
+  document.addEventListener('astro:page-load', () => {
+    const header = document.querySelector<HTMLElement>('[data-site-header]');
+    if (onScroll) window.removeEventListener('scroll', onScroll);
+    if (!header) return;
+    onScroll = () => header.classList.toggle('is-solid', window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  });
+</script>

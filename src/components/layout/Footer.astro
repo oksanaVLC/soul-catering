@@ -1,5 +1,6 @@
 ---
 import Button from '../ui/Button.astro';
+import Logo from '../ui/Logo.astro';
 import {
   getLangFromUrl,
   isPublished,
@@ -85,7 +86,7 @@ const columns = [
 
       <div class="cols">
         <div class="brand">
-          <span class="logo-font">{t('site.name')}</span>
+          <Logo tone="light" link={false} />
           <p>
             {t('footer.address')}
             <br />
@@ -146,7 +147,7 @@ const columns = [
 ) : (
   <footer class="foot compact">
     <div class="container row">
-      <span class="logo-font logo">{t('site.name')}</span>
+      <Logo tone="light" link={false} />
       <nav aria-label={t('footer.compactLabel')} class="links">
         {compactLinks.map((l) =>
           l.href ? (
@@ -284,9 +285,8 @@ const columns = [
     gap: 16px;
   }
 
-  .brand .logo-font {
-    color: var(--white);
-    font-size: 34px;
+  .brand > :global(.logo-stack) {
+    align-self: flex-start;
   }
 
   .brand p {
@@ -342,11 +342,6 @@ const columns = [
     gap: 24px;
     align-items: center;
     font-size: 17px;
-  }
-
-  .compact .logo {
-    color: var(--white);
-    font-size: 30px;
   }
 
   .links {

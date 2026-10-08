@@ -8,6 +8,7 @@ import { Image } from 'astro:assets';
 import { fade } from 'astro:transitions';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LangSwitcher from '../components/layout/LangSwitcher.astro';
+import Logo from '../components/ui/Logo.astro';
 import servilletaLazo from '../assets/images/servilleta-lazo.webp';
 import { DEMO_PANEL_PATH } from '../lib/access/demo-access';
 import es from '../i18n/es.json';
@@ -31,7 +32,7 @@ const tabTexts = {
   <div class="access" data-access data-errors-text={JSON.stringify(errorTexts)} data-tabs={JSON.stringify(tabTexts)} data-panel-path={localizePath(DEMO_PANEL_PATH, lang)} data-demo-google={t('access.demoGoogle')} data-demo-register={t('access.demoRegister')}>
     <div class="side">
       <Image src={servilletaLazo} alt="" widths={[600, 900, 1200]} sizes="(max-width: 1040px) 100vw, 50vw" loading="eager" class="side-img" />
-      <a href={home} class="logo logo-font" aria-label={t('nav.home')}>{t('site.name')}</a>
+      <Logo />
       <div class="side-copy">
         <p class="serif side-title">{t('access.sideTitle')}</p>
         <p class="side-text">{t('access.sideText')}</p>
@@ -172,14 +173,8 @@ const tabTexts = {
     z-index: -1;
   }
 
-  .logo {
-    font-size: 30px;
-    text-decoration: none;
-    color: var(--ink);
+  .side > :global(.logo-stack) {
     align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
   }
 
   .side-copy {

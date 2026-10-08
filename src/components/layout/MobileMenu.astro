@@ -70,8 +70,8 @@ const close = icon(faXmark, {
     </ul>
 
     <div class="actions">
-      <Button href={bookHref}>{t('nav.book')}</Button>
-      <Button href={loginHref}>{t('nav.login')}</Button>
+      <Button href={bookHref} variant="v5-dark">{t('nav.book')}</Button>
+      <Button href={loginHref} variant="v5-dark">{t('nav.login')}</Button>
     </div>
     <div class="socials" aria-label="Social media">
       <a href="#" aria-label="YouTube" class="social-link">
@@ -115,7 +115,7 @@ const close = icon(faXmark, {
     border-radius: 50%;
 
     background: transparent;
-    color: var(--ink);
+    color: var(--ink-v5);
 
     align-items: center;
     justify-content: center;
@@ -151,7 +151,7 @@ const close = icon(faXmark, {
        */
   .mobile-panel {
     position: fixed;
-    z-index: 1999;
+    z-index: 49; /* just below the fixed header (z-index 50) */
 
     top: var(--header-h);
     right: 0;

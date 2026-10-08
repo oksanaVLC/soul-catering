@@ -89,7 +89,6 @@
   /* ── Typography ── */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Lato', system-ui, sans-serif;
-  --font-logo: 'Rubik Dirt', var(--font-serif);
 
   /* ── v5 colors (CAMBIOS-v5.md, authorized) ── */
   --brown: #3b2810; /* main button */
@@ -109,12 +108,11 @@
   /* ── Layout ── */
   --container: 1240px;
   --gutter: 40px;
-  --header-h: 78px;
+  --header-h: 96px; /* fixed header (CAMBIOS-v5 §2) */
 }
 
 @media (max-width: 900px) {
   :root {
     --gutter: 20px;
-    --header-h: 58px;
   }
 }

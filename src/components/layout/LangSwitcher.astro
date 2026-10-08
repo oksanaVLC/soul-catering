@@ -59,14 +59,14 @@ const globe = icon(faGlobe, { attributes: { 'aria-hidden': 'true' } }).html.join
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    min-height: 50px;
+    min-height: 46px;
     padding: 0 10px;
-    border-radius: 999px;
+    border-radius: 2px;
     background: none;
     border: 0;
-    color: var(--ink);
-    font: 600 16px var(--font-sans);
-    letter-spacing: 0.04em;
+    color: var(--ink-v5);
+    font: 400 15px var(--font-sans);
+    letter-spacing: 0.2em;
     cursor: pointer;
     white-space: nowrap;
   }
@@ -83,7 +83,7 @@ const globe = icon(faGlobe, { attributes: { 'aria-hidden': 'true' } }).html.join
   }
 
   summary :global(.fa-globe) {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   [open] .chev {
@@ -98,9 +98,9 @@ const globe = icon(faGlobe, { attributes: { 'aria-hidden': 'true' } }).html.join
     padding: 8px;
     list-style: none;
     background: var(--white);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    box-shadow: 0 12px 32px rgba(20, 20, 20, 0.16);
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+    box-shadow: 0 12px 32px rgba(59, 40, 16, 0.1);
     min-width: 210px;
     z-index: 30;
     display: flex;
@@ -114,9 +114,9 @@ const globe = icon(faGlobe, { attributes: { 'aria-hidden': 'true' } }).html.join
     justify-content: space-between;
     min-height: 50px;
     padding: 0 16px;
-    border-radius: 8px;
+    border-radius: 2px;
     text-decoration: none;
-    color: var(--ink);
+    color: var(--ink-v5);
     font-size: 18px;
     font-weight: 500;
   }

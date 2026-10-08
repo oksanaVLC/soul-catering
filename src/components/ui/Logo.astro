@@ -1,0 +1,60 @@
+---
+// Stacked logo «SOUL / CATERING» (CAMBIOS-v5 §2), the same on every page.
+// tone="light": light colors for dark backgrounds (footer).
+import { getLangFromUrl, localizePath, useTranslations } from '../../i18n/utils';
+
+interface Props {
+  tone?: 'dark' | 'light';
+  /** false: plain text (no link), e.g. inside the panel sidebar. */
+  link?: boolean;
+  class?: string;
+}
+
+const { tone = 'dark', link = true, class: extra } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const Tag = link ? 'a' : 'span';
+---
+
+<Tag
+  href={link ? localizePath('/', lang) : undefined}
+  class:list={['logo-stack', `tone-${tone}`, extra]}
+  aria-label={link ? t('nav.home') : undefined}
+>
+  <span class="soul" aria-hidden={link ? 'true' : undefined}>SOUL</span>
+  <span class="catering" aria-hidden={link ? 'true' : undefined}>CATERING</span>
+</Tag>
+
+<style>
+  .logo-stack {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 44px;
+    text-decoration: none;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .soul {
+    font: 300 32px/1 var(--font-serif);
+    letter-spacing: 0.16em;
+    color: var(--bronze);
+  }
+
+  .catering {
+    margin-top: 4px;
+    font: 400 11px/1 var(--font-sans);
+    letter-spacing: 0.42em;
+    color: var(--text-v5);
+  }
+
+  .tone-light .soul {
+    color: var(--foot-heading);
+  }
+
+  .tone-light .catering {
+    color: var(--foot-text);
+  }
+</style>

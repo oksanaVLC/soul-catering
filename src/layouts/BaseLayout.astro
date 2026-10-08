@@ -7,7 +7,6 @@ import '@fontsource/cormorant-garamond/300-italic.css';
 import '@fontsource/cormorant-garamond/400-italic.css';
 import '@fontsource/lato/400.css';
 import '@fontsource/lato/700.css';
-import '@fontsource/rubik-dirt/400.css';
 import '../styles/global.css';
 
 import { getImage } from 'astro:assets';
@@ -22,7 +21,8 @@ interface Props {
   description?: string;
   /** Site footer: full (Inicio), compact (Extras, Bodas, Blog, Reserva), none (Acceso, Panel). */
   footer?: 'full' | 'compact' | 'none';
-  /** site: general header. overlay: same header on top of the hero (Inicio).
+  /** The header is always fixed. site: the content starts below it (padding-top).
+      overlay: the content starts at the top, under the header (Inicio, its hero compensates).
       none: no general header (prepared for /acceso, which has its own header in the design). */
   header?: 'site' | 'overlay' | 'none';
   /** false: the page provides its own <main id="main-content"> (Acceso, Panel: own structure). */
@@ -89,9 +89,13 @@ const textureVars = `--tex-silver: url("${silver.src}");`;
     <a class="skip-link" href="#main-content">
       {t('a11y.skip')}
     </a>
-    {header !== 'none' && <Header overlay={header === 'overlay'} />}
+    {header !== 'none' && <Header />}
     {wrapMain ? (
-      <main id="main-content" transition:animate={fade({ duration: '300ms' })}>
+      <main
+        id="main-content"
+        class:list={{ 'under-header': header === 'site' }}
+        transition:animate={fade({ duration: '300ms' })}
+      >
         <slot />
       </main>
     ) : (
