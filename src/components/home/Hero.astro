@@ -78,19 +78,25 @@ const titleWords2 = toWords(titleLine2);
 
 <style>
   /* Fallback: if the video cannot start, the poster is seen as a still image. */
+  /* min-height (not height): the hero grows when the content does not fit
+     (small phones, browser text size at 130 %) instead of spilling under the header. */
   .hero {
     position: relative;
     display: flex;
-    align-items: center;
-    height: 100svh;
-    min-height: 640px;
+    flex-direction: column;
+    justify-content: center;
+    justify-content: safe center;
+    min-height: max(640px, 100vh);
+    min-height: max(640px, 100svh);
     overflow: hidden;
     background: #e9efec url('/video/hero-poster.jpg') center / cover no-repeat;
   }
 
+  /* Large screens: same 940px cap as before, but as a minimum so it can still grow */
   @media (min-width: 1024px) {
     .hero {
-      max-height: 940px;
+      min-height: clamp(640px, 100vh, 940px);
+      min-height: clamp(640px, 100svh, 940px);
     }
   }
 
@@ -133,9 +139,10 @@ const titleWords2 = toWords(titleLine2);
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding-top: 72px;
-    /* room for the scroll cue, so it never overlaps the buttons */
-    padding-bottom: 116px;
+    /* clear the fixed header */
+    padding-top: calc(var(--header-h) + 24px);
+    /* room for the scroll cue (30 + 56 + 12 + 11 = 109px), so it never overlaps the buttons */
+    padding-bottom: 140px;
   }
 
   /* Eyebrow with a gold line on each side (flex: the lines stay centred when the text wraps) */
@@ -239,6 +246,22 @@ const titleWords2 = toWords(titleLine2);
     .ctas :global(.btn-v5) {
       width: 100%;
       padding: 0 20px;
+    }
+  }
+
+  /* Small or short screens: tighter spacing so everything fits below the header */
+  @media (max-width: 479.98px), (max-height: 699.98px) {
+    h1 {
+      margin-top: 20px;
+      font-size: clamp(40px, 11vw, 56px);
+    }
+
+    .text {
+      font-size: 18px;
+    }
+
+    .ctas {
+      margin-top: 28px;
     }
   }
 
@@ -367,6 +390,10 @@ const titleWords2 = toWords(titleLine2);
   @media (max-height: 720px) {
     .scroll-cue {
       display: none;
+    }
+
+    .content {
+      padding-bottom: 48px;
     }
   }
 </style>
